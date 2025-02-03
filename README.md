@@ -12,7 +12,7 @@ A feature-rich implementation of logic gates fully compatible with Minecraft Red
 1. Download the latest `LogicGates.jar` from [Releases](https://github.com/piotrmaciejbednarski/logicgates/releases)
 2. Place the JAR file in your server's `plugins/` directory
 3. Restart your Minecraft server
-4. (Optional) Configure `config.yml` for advanced settings
+4. (Optional) Configure `gates.yml` for advanced settings
 
 ## Contributing
 
