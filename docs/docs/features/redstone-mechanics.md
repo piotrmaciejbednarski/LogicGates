@@ -122,4 +122,4 @@ When a nearby Redstone signal changes, the plugin processes the change in severa
 
 The plugin allows an interesting trick. When you have a gate and place any carpet (material CARPET) on its output, the gate will shift the output signal by one block, enabling you to move the signal.
 
-![Moving output signal](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/moving-output-signal.png)
+![Moving output signal](../assets/moving-output-signal.png)

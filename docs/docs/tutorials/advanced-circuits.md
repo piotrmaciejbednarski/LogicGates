@@ -11,7 +11,7 @@ Using the plugin, you can create more advanced logic circuits. Below is an examp
 
 ![Half adder](https://upload.wikimedia.org/wikipedia/commons/d/d9/Half_Adder.svg)
 
-![Half adder in LogicGates](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/half-adder.gif)
+![Half adder in LogicGates](../assets/half-adder.gif)
 
 The above circuit is built in the mode with redstone compatibility disabled (by default).
 
@@ -29,10 +29,10 @@ The observer transmits a Redstone signal downward to a single **Redstone dust**,
 
 From this powered block, on the right side, a **repeater** transmits the signal to the memory cell output (**REDSTONE_LAMP**).  
 
-![type:video](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/simple5bitmemory.mp4)
+![type:video](../assets/simple5bitmemory.mp4)
 
 ## SR Flip Flop
 
 With the help of two NAND gates and manual NOT gates, an SR Flip-Flop (also known as an SR Latch) has been constructed. It is a sequential logic circuit with two output states used for storing binary information. It can be built using either NAND gates or NOR gates.
 
-![type:video](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/srflipflop.mp4)
+![type:video](../assets/srflipflop.mp4)

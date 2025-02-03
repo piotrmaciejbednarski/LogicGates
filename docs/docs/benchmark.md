@@ -10,7 +10,7 @@ The benchmark was conducted on a 5-bit memory used in the examples from the [Adv
 
 ## Measurement Results
 
-![Benchmark](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/benchmark.png)
+![Benchmark](assets/benchmark.png)
 
 #### Setting High States (times_high):
 - **Total Time:** 2,165,000 ns  

@@ -1,5 +1,5 @@
 # Welcome to LogicGates Plugin!
-![Plugin logo](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/header.png)
+![Plugin logo](assets/header.png)
 
 A powerful implementation of logic gates compatible with Redstone, designed as a Bukkit plugin for Minecraft servers. Create advanced Redstone circuits with easy-to-use gates and an intuitive interface.  
 
