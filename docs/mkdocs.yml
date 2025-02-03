@@ -1,5 +1,8 @@
 site_name: LogicGates Docs
-site_url: https://piotrmaciejbednarski.github.io/logicgates-docs
+site_author: Piotr Bednarski
+site_description: LogicGates Spigot - Plugin Documentation
+site_url: https://piotrmaciejbednarski.github.io/logicgates-docs/
+repo_url: https://github.com/piotrmaciejbednarski/LogicGates/
 theme:
   name: material
   features:

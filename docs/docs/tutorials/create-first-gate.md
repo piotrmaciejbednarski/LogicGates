@@ -6,7 +6,7 @@ For this mechanism, we will use an XOR gate (by default, the carpet color is red
 
 First, make sure you have the proper permissions to build gates, namely `logicgates.place`, `logicgates.break`, `logicgates.give`, and `logicgates.rotate`. These four permissions should be more than enough for basic operation.
 
-![Build first gate animation](https://piotrmaciejbednarski.github.io/logicgates-docs/assets/first-logic-gate.gif)
+![Build first gate animation](../assets/first-logic-gate.gif)
 
 ## Step One
 
