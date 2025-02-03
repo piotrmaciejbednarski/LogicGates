@@ -1,0 +1,40 @@
+name: Build and Release Plugin
+
+on:
+  push:
+    tags:
+      - '*'  # Uruchamianie akcji dla każdego taga
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build plugin
+        run: ./gradlew clean build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin-jar
+          path: build/libs/*.jar
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          body: "New plugin release."
+          draft: false
+          prerelease: false
+          artifacts: "plugin-jar/*"

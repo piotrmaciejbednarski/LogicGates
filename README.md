@@ -1,0 +1,29 @@
+# LogicGates: Advanced Redstone Circuit Plugin for Minecraft (Bukkit/Spigot)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A feature-rich implementation of logic gates fully compatible with Minecraft Redstone systems. Create complex circuits with ease using intuitive gates and seamless Redstone integration. Perfect for technical servers and redstone engineers.
+
+🔗 **Check documentation**: [https://piotrmaciejbednarski.github.io/logicgates-docs/](https://piotrmaciejbednarski.github.io/logicgates-docs/)
+
+## Installation
+
+1. Download the latest `LogicGates.jar` from [Releases](https://github.com/piotrmaciejbednarski/logicgates/releases)
+2. Place the JAR file in your server's `plugins/` directory
+3. Restart your Minecraft server
+4. (Optional) Configure `config.yml` for advanced settings
+
+## Contributing
+
+We welcome contributions! Please follow these steps:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+Report issues [here](https://github.com/piotrmaciejbednarski/logicgates/issues)
+
+## License
+
+Distributed under MIT License. See [LICENSE](https://mit-license.org/) for details.

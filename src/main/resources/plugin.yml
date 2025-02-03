@@ -1,0 +1,35 @@
+name: LogicGates
+version: '1.1.4-SNAPSHOT'
+main: com.piotrbednarski.logicgatesplugin.LogicGatesPlugin
+api-version: '1.16'
+softdepend: [ Multiverse-Core ]
+authors: [ Piotr Bednarski ]
+description: Forget about giant Redstone logic gates. All logic gates in one block!
+website: https://bednarskiwsieci.pl
+
+commands:
+  logicgates:
+    description: LogicGates Plugin
+    usage: /logicgates [help|give|inspect|rotate|save|fixparticles|particles|cooldown|language|author]
+permissions:
+  logicgates.place:
+    description: Allows placing logic gates
+    default: op
+  logicgates.break:
+    description: Allows breaking logic gates
+    default: op
+  logicgates.rotate:
+    description: Allows rotating gates
+    default: op
+  logicgates.inspect:
+    description: Allows inspecting gates
+    default: op
+  logicgates.admin:
+    description: Admin commands
+    default: op
+  logicgates.give:
+    description: Allows the player to receive special carpet
+    default: op
+  logicgates.timer:
+    description: Allows changing timer cooldown
+    default: op
