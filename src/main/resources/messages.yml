@@ -1,12 +1,12 @@
 messages:
   en:
-    prefix: "&6&l[LogicGates] &r"
+    prefix: "&8[&6LogicGates&8] &r" # Darker gray prefix, gold plugin name
     errors:
       no_permission: "&cYou don't have permission!"
       invalid_subcommand: "&cUnknown command. Use /logicgates help"
       cooldown_invalid: "&cInvalid cooldown!"
       player_only: "&cPlayer-only command!"
-      command_usage: "&cUsage: /logicgates [help|inspect|rotate|save|fixparticles|particles|cooldown]"
+      command_usage: "&cUsage: /logicgates [help|give|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]"
       not_timer_gate: "&cThis is not a timer gate!"
     gate_created: "&aCreated %s gate!"
     gate_removed: "&aGate successfully removed!"
@@ -20,10 +20,10 @@ messages:
     toggle_input_mode: "&6Click the gate to change the number of inputs (2/3)"
     gate_input_toggled: "&6The &e%s &6gate has been changed to %s-input"
 
-    redstonecompatibility_usage: "Usage: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "Redstone compatibility has been enabled."
-    redstonecompatibility_disabled: "Redstone compatibility has been disabled."
-    redstonecompatibility_invalid_state: "Invalid state. Use 'on' or 'off'."
+    redstonecompatibility_usage: "&cUsage: /logicgates redstonecompatibility <on|off>" # Consistent red
+    redstonecompatibility_enabled: "&aRedstone compatibility has been enabled."
+    redstonecompatibility_disabled: "&cRedstone compatibility has been disabled."
+    redstonecompatibility_invalid_state: "&cInvalid state. Use 'on' or 'off'."
 
     command_disabled: "&cThis command is disabled because carpet items are not configured."
     no_config_for_gate: "&cNo configuration found for gate type %s."
@@ -32,11 +32,9 @@ messages:
     invalid_gate_type: "&cInvalid gate type: %s."
     give_usage: "&cUsage: /logicgates give <gateType>"
 
-    colors_header: "&6==== Logic Gates - Colors ===="
-
-    howto_header: "&6==== Logic Gates - How to? ===="
-
-    help_header: "&6==== Logic Gates Help ===="
+    colors_header: "&8==== &6Logic Gates - Colors &8====" # Darker gray separators
+    howto_header: "&8==== &6Logic Gates - How to? &8===="
+    help_header: "&8==== &6Logic Gates Help &8===="
     help_colors: "&e/logicgates colors - Logic gates list and carpet colors"
     help_howto: "&e/logicgates howto - Quick guide to getting started"
     help_rotate: "&e/logicgates rotate - Click a gate to rotate"
@@ -50,7 +48,7 @@ messages:
     help_toggleinput: "&e/logicgates toggleinput - Toggle the selected gateway to 2 or 3-input"
     help_timer: "&e/logicgates timer [time_in_seconds] - Change timer gate cooldown (Default: 1 second)"
 
-    author_header: "&6==== Logic Gates ===="
+    author_header: "&8==== &6Logic Gates &8===="
     author_name: "&eAuthor: Piotr Bednarski"
     author_contact: "&eContact: piotr.maciej.bednarski@gmail.com"
 
@@ -59,7 +57,7 @@ messages:
     particles_reloaded: "&aParticles reloaded!"
     particles_usage: "&cUsage: /logicgates particles [on|off]"
     particles_enabled: "&aParticles enabled!"
-    particles_disabled: "&aParticles disabled!"
+    particles_disabled: "&cParticles disabled!"
     particles_invalid_state: "&cInvalid state. Use 'on' or 'off'."
 
     cooldown_usage: "&cUsage: /logicgates cooldown [milliseconds] (Default: 100)"
@@ -71,7 +69,7 @@ messages:
 
     unknown_command: "&cUnknown subcommand. Use /logicgates help for help."
 
-    inspect_header: "&6=== Logic Gate inspection ==="
+    inspect_header: "&8=== &6Logic Gate inspection &8==="
     inspect_type: "Type: &e%s"
     inspect_facing: "Facing: &b%s"
     inspect_output: "Output: %s"

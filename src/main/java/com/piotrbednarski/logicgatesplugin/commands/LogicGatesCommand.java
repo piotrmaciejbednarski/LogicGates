@@ -301,7 +301,7 @@ public class LogicGatesCommand implements CommandExecutor {
     /// Sends color coding information to sender
     /// @param sender Command sender
     private void sendColorInformation(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("colors_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("colors_header"));
         sendClickableMessage(
                 sender,
                 "Press the button to go to the documentation:\n",
@@ -315,7 +315,7 @@ public class LogicGatesCommand implements CommandExecutor {
     /// Sends how-to instructions to sender
     /// @param sender Command sender
     private void sendHowToInstructions(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("howto_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("howto_header"));
 
         sendClickableMessage(
                 sender,
@@ -330,7 +330,7 @@ public class LogicGatesCommand implements CommandExecutor {
     /// Sends help information to sender
     /// @param sender Command sender
     private void sendHelpInformation(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("help_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("help_header"));
         sendMultipleMessages(sender, "help_colors", "help_howto", "help_rotate",
                 "help_inspect", "help_particles", "help_save",
                 "help_fixparticles", "help_language", "help_redstonecompatibility",
@@ -340,7 +340,7 @@ public class LogicGatesCommand implements CommandExecutor {
     /// Sends author information to sender
     /// @param sender Command sender
     private void sendAuthorInfo(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("author_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("author_header"));
         sendMultipleMessages(sender, "author_name", "author_contact");
     }
 
