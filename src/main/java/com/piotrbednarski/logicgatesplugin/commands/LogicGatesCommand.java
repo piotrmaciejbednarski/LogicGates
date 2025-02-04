@@ -319,7 +319,7 @@ public class LogicGatesCommand implements CommandExecutor {
     private void sendHelpInformation(CommandSender sender) {
         sender.sendMessage(plugin.getMessage("help_header"));
         sendMultipleMessages(sender, "help_colors", "help_howto", "help_rotate",
-                "help_inspect", "help_cooldown", "help_particles", "help_save",
+                "help_inspect", "help_particles", "help_save",
                 "help_fixparticles", "help_language", "help_redstonecompatibility",
                 "help_give", "help_timer");
     }
