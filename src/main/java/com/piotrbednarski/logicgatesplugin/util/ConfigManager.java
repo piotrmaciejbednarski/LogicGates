@@ -24,7 +24,6 @@ public class ConfigManager {
     public static final String CONFIG_REDSTONE_COMPATIBILITY = "redstoneCompatibility";
     public static final String CONFIG_PARTICLES_VIEW_DISTANCE = "particlesViewDistance";
     public static final String CONFIG_LANGUAGE = "language";
-    public static final String CONFIG_COOLDOWN_MS = "cooldownMs";
 
     private final LogicGatesPlugin plugin;
     private File configFile;
@@ -138,7 +137,6 @@ public class ConfigManager {
             diskConfig.set(CONFIG_REDSTONE_COMPATIBILITY, plugin.isRedstoneCompatibility());
             diskConfig.set(CONFIG_PARTICLES_VIEW_DISTANCE, plugin.getParticleViewDistance());
             diskConfig.set(CONFIG_LANGUAGE, plugin.getDefaultLang());
-            diskConfig.set(CONFIG_COOLDOWN_MS, plugin.getCooldownMs());
 
             if (config.contains(CONFIG_GATES)) {
                 diskConfig.set(CONFIG_GATES, config.get(CONFIG_GATES));

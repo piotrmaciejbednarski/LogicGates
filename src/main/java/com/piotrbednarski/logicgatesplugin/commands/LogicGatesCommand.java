@@ -63,7 +63,6 @@ public class LogicGatesCommand implements CommandExecutor {
             case "redstonecompatibility" -> handleRedstoneCompatibility(sender, args);
             case "fixparticles" -> handleFixParticles(sender);
             case "particles" -> handleParticlesToggle(sender, args);
-            case "cooldown" -> handleCooldownSetting(sender, args);
             case "language" -> handleLanguageChange(sender, args);
             case "timer" -> handleTimerCooldownSetting(sender, args);
             case "reload" -> handleReload(sender);
@@ -403,29 +402,6 @@ public class LogicGatesCommand implements CommandExecutor {
             default -> sender.sendMessage(plugin.getMessage("particles_invalid_state"));
         }
         plugin.saveGates();
-    }
-
-    /// Handles cooldown setting
-    /// @param sender Command sender
-    /// @param args Command arguments
-    private void handleCooldownSetting(CommandSender sender, String[] args) {
-        if (!validateAdminPermission(sender)) return;
-
-        if (args.length < 2) {
-            sender.sendMessage(plugin.getMessage("cooldown_usage"));
-            return;
-        }
-
-        try {
-            long newCooldown = Long.parseLong(args[1]);
-            if (newCooldown < 0) throw new NumberFormatException();
-
-            plugin.setCooldownMs(newCooldown);
-            sender.sendMessage(plugin.getMessage("cooldown_set", newCooldown));
-            plugin.saveGates();
-        } catch (NumberFormatException e) {
-            sender.sendMessage(plugin.getMessage("errors.cooldown_invalid"));
-        }
     }
 
     /// Handles language change

@@ -671,20 +671,6 @@ public class LogicGatesPlugin extends JavaPlugin {
         this.redstoneCompatibility = redstoneCompatibility;
     }
 
-    /// Returns the cooldown duration in milliseconds.
-    ///
-    /// @return the cooldown duration in ms
-    public long getCooldownMs() {
-        return cooldownMs;
-    }
-
-    /// Sets the cooldown duration in milliseconds.
-    ///
-    /// @param cooldownMs the new cooldown duration in ms
-    public void setCooldownMs(long cooldownMs) {
-        this.cooldownMs = cooldownMs;
-    }
-
     /// Returns the default language code.
     ///
     /// @return the default language
