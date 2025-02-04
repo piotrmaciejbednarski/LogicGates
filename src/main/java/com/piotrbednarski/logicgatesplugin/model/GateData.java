@@ -27,9 +27,7 @@ public class GateData {
         return type;
     }
 
-    public boolean isState() {
-        return state;
-    }
+    public boolean getState() { return state; }
 
     public void setState(boolean state) {
         this.state = state;
