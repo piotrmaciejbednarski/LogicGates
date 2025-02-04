@@ -18,7 +18,7 @@ import java.util.Objects;
 public class ConfigManager {
 
     // Configuration keys
-    public static final String CONFIG_FILE_NAME = "gates.yml";
+    public static final String CONFIG_FILE_NAME = "config.yml";
     public static final String CONFIG_GATES = "gates";
     public static final String CONFIG_PARTICLES_ENABLED = "particlesEnabled";
     public static final String CONFIG_REDSTONE_COMPATIBILITY = "redstoneCompatibility";
