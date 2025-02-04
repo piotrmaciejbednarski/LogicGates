@@ -31,7 +31,7 @@ public class GateListener implements Listener {
 
     private final LogicGatesPlugin plugin;
 
-    // Define the rotation order for gate directions (North -> East -> South -> West).
+    // Define the rotation order for gate directions (North -> East -> South -> West)
     public static final BlockFace[] ROTATION_ORDER = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 
     /// Constructor for GateListener.
@@ -69,9 +69,9 @@ public class GateListener implements Listener {
         Block placedBlock = event.getBlock();
         Player player = event.getPlayer();
 
-        // Check if the placed block is a carpet that represents a logic gate.
+        // Check if the placed block is a carpet that represents a logic gate
         if (plugin.getCarpetTypes().containsKey(placedBlock.getType())) {
-            // Verify if the item used to place the block matches the configuration.
+            // Verify if the item used to place the block matches the configuration
             if (plugin.getGatesConfig().isConfigurationSection("carpets")) {
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
                 ConfigurationSection gateSection = plugin.getGatesConfig().getConfigurationSection("carpets." + type.name());
@@ -79,7 +79,7 @@ public class GateListener implements Listener {
                     ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
                     assert itemSection != null;
 
-                    // Get expected material, name, and lore from the configuration.
+                    // Get expected material, name, and lore from the configuration
                     Material expectedMaterial = Material.matchMaterial(itemSection.getString("material", ""));
                     String expectedName = ChatColor.translateAlternateColorCodes('&', itemSection.getString("name", ""));
                     List<String> expectedLore = itemSection.getStringList("lore")
@@ -87,10 +87,10 @@ public class GateListener implements Listener {
                             .map(s -> ChatColor.translateAlternateColorCodes('&', s))
                             .collect(Collectors.toList());
 
-                    // Get the item used to place the block.
+                    // Get the item used to place the block
                     ItemStack placedItem = event.getItemInHand();
 
-                    // Verify the item's material, name, and lore.
+                    // Verify the item's material, name, and lore
                     ItemMeta meta = placedItem.getItemMeta();
                     if (expectedMaterial != placedItem.getType() ||
                             meta == null ||
@@ -98,12 +98,12 @@ public class GateListener implements Listener {
                             !meta.getDisplayName().equals(expectedName) ||
                             !meta.hasLore() ||
                             !Objects.equals(meta.getLore(), expectedLore)) {
-                        return; // Exit if the item does not match the configuration.
+                        return; // Exit if the item does not match the configuration
                     }
                 }
             }
 
-            // Check if the block below the carpet is glass.
+            // Check if the block below the carpet is glass
             Block glassBlockBelow = placedBlock.getRelative(BlockFace.DOWN);
             if (glassBlockBelow.getType() == Material.GLASS) {
                 if (!player.hasPermission("logicgates.place")) {
@@ -112,7 +112,7 @@ public class GateListener implements Listener {
                     return;
                 }
 
-                // Create a new gate with the default facing direction (NORTH).
+                // Create a new gate with the default facing direction (NORTH)
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
                 GateData data = new GateData(getPlayerFacingDirection(player), type);
                 boolean defaultState = GateUtils.calculateOutput(type, false, false, data);
@@ -128,7 +128,7 @@ public class GateListener implements Listener {
             }
         }
 
-        // Update neighboring gates after placing a block.
+        // Update neighboring gates after placing a block
         for (BlockFace face : ROTATION_ORDER) {
             Block neighbor = placedBlock.getRelative(face);
             if (neighbor.getType() == Material.GLASS && plugin.getGates().containsKey(neighbor.getLocation())) {
@@ -139,7 +139,7 @@ public class GateListener implements Listener {
 
                 plugin.updateGate(neighbor);
 
-                // Check the gate's output block for invalid materials.
+                // Check the gate's output block for invalid materials
                 Block outputBlock = neighbor.getRelative(data.getFacing());
                 if (outputBlock.getType() == Material.REDSTONE_WIRE ||
                         outputBlock.getType() == Material.REPEATER ||
@@ -160,16 +160,43 @@ public class GateListener implements Listener {
         Block brokenBlock = event.getBlock();
         Player player = event.getPlayer();
 
-        // Handle breaking of glass blocks (gates).
+        // Handle breaking of glass blocks (gates)
         if (isBlockGate(event, player, brokenBlock)) return;
 
-        // Handle breaking of carpets (activation blocks for gates).
+        // Handle breaking of carpets (activation blocks for gates)
         if (plugin.getCarpetTypes().containsKey(brokenBlock.getType())) {
             Block gateBlock = brokenBlock.getRelative(BlockFace.DOWN);
-            if (isBlockGate(event, player, gateBlock)) return;
+            if (gateBlock.getType() == Material.GLASS && plugin.getGates().containsKey(gateBlock.getLocation())) {
+                if (!player.hasPermission("logicgates.break")) {
+                    event.setCancelled(true);
+                    player.sendMessage(plugin.getMessage("errors.no_permission"));
+                    return;
+                }
+
+                // Cancel the event to prevent default carpet breaking
+                event.setCancelled(true);
+
+                // Remove gate data
+                plugin.getGates().remove(gateBlock.getLocation());
+                plugin.saveGates();
+                player.sendMessage(plugin.getMessage("gate_removed"));
+
+                // Create and add a special carpet item to the player's inventory
+                GateType type = plugin.getCarpetTypes().get(brokenBlock.getType());
+                ItemStack carpetItem = createGateItem(type);
+                if (carpetItem != null) {
+                    player.getInventory().addItem(carpetItem).values().forEach(item -> {
+                        player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    });
+                }
+
+                // Remove the carpet from the world
+                brokenBlock.setType(Material.AIR);
+                return;
+            }
         }
 
-        // Update neighboring gates after breaking a block.
+        // Update neighboring gates after breaking a block
         for (BlockFace face : ROTATION_ORDER) {
             Block neighbor = brokenBlock.getRelative(face);
             if (neighbor.getType() == Material.GLASS && plugin.getGates().containsKey(neighbor.getLocation())) {
@@ -190,11 +217,47 @@ public class GateListener implements Listener {
                 player.sendMessage(plugin.getMessage("errors.no_permission"));
                 return true;
             }
+
+            // Remove the gate and associated carpet
             plugin.getGates().remove(gateBlock.getLocation());
             plugin.saveGates();
             player.sendMessage(plugin.getMessage("gate_removed"));
+
+            // Remove the carpet above the glass block
+            Block carpetBlock = gateBlock.getRelative(BlockFace.UP);
+            if (plugin.getCarpetTypes().containsKey(carpetBlock.getType())) {
+                carpetBlock.setType(Material.AIR);
+            }
+
+            return true;
         }
         return false;
+    }
+
+    private ItemStack createGateItem(GateType type) {
+        ConfigurationSection gateSection = plugin.getGatesConfig().getConfigurationSection("carpets." + type.name());
+        if (gateSection != null && gateSection.isConfigurationSection("item")) {
+            ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
+            Material material = Material.matchMaterial(itemSection.getString("material", ""));
+            if (material == null) return null;
+
+            ItemStack item = new ItemStack(material);
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) return item;
+
+            // Set the name and lore according to the configuration
+            String name = ChatColor.translateAlternateColorCodes('&', itemSection.getString("name", ""));
+            List<String> lore = itemSection.getStringList("lore").stream()
+                    .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                    .collect(Collectors.toList());
+
+            meta.setDisplayName(name);
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+
+            return item;
+        }
+        return null;
     }
 
     /// Handles the BlockRedstoneEvent to update gates when redstone power changes.
@@ -202,7 +265,7 @@ public class GateListener implements Listener {
     /// @param event The BlockRedstoneEvent triggered when redstone power changes.
     @EventHandler
     public void onRedstoneChange(BlockRedstoneEvent event) {
-        // Mark adjacent glass blocks as needing updates when redstone changes.
+        // Mark adjacent glass blocks as needing updates when redstone changes
         for (BlockFace face : BlockFace.values()) {
             Block possibleGate = event.getBlock().getRelative(face);
             if (possibleGate.getType() == Material.GLASS) {
@@ -272,7 +335,7 @@ public class GateListener implements Listener {
             }
         }
 
-        // Handle rotation mode.
+        // Handle rotation mode
         if (plugin.getRotationModePlayers().contains(player.getUniqueId())) {
             if (!player.hasPermission("logicgates.rotate")) {
                 plugin.getRotationModePlayers().remove(player.getUniqueId());
