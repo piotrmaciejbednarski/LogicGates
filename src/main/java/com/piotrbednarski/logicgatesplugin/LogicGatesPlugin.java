@@ -6,7 +6,10 @@ import com.piotrbednarski.logicgatesplugin.model.GateData;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
 import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.GateUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -22,6 +25,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.piotrbednarski.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
 
@@ -30,14 +35,17 @@ import static com.piotrbednarski.logicgatesplugin.listeners.GateListener.ROTATIO
 public class LogicGatesPlugin extends JavaPlugin {
 
     //region Data Storage
-    private final Map<Location, GateData> gates = new HashMap<>();
-    private final Set<Location> gatesToUpdate = Collections.synchronizedSet(new HashSet<>());
+    private final ConcurrentHashMap<Location, GateData> gates = new ConcurrentHashMap<>();
+    private final ConcurrentLinkedQueue<Location> gatesToUpdate = new ConcurrentLinkedQueue<>();
     private final Set<UUID> debugPlayers = new HashSet<>();
     private final Set<UUID> rotationModePlayers = new HashSet<>();
     private final Set<UUID> inspectionModePlayers = new HashSet<>();
     private final Set<UUID> cooldownModePlayers = new HashSet<>();
     private final Map<UUID, Integer> pendingCooldowns = new HashMap<>();
-    private final Map<Location, Long> lastUpdateTimes = new HashMap<>();
+
+    // Tick management system
+    private volatile long serverTick = 0L;
+    private final ConcurrentHashMap<Location, Long> lastUpdateTicks = new ConcurrentHashMap<>();
 
     // Mapping of carpet colors to gate types
     private final Map<Material, GateType> carpetTypes = new HashMap<>() {{
@@ -182,6 +190,28 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Gate management
+    private void initializeTickSystem() {
+        // Update tick counter every server tick (50ms)
+        Bukkit.getScheduler().runTaskTimer(this, () -> serverTick++, 0L, 1L);
+    }
+
+    private void scheduleDependentUpdates(Block outputBlock, BlockFace facing) {
+        // Check all potential connection directions
+        EnumSet<BlockFace> directions = EnumSet.of(
+                facing,
+                facing.getOppositeFace(),
+                GateUtils.rotateClockwise(facing, ROTATION_ORDER),
+                GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER)
+        );
+
+        directions.forEach(dir -> {
+            Location dependentLoc = outputBlock.getRelative(dir).getLocation();
+            if(gates.containsKey(dependentLoc)) {
+                gatesToUpdate.offer(dependentLoc);
+            }
+        });
+    }
+
     /// Updates the gate's output based on its current redstone inputs
     ///
     /// This method checks if the gate has the proper activation carpet and if the cooldown period
@@ -197,46 +227,58 @@ public class LogicGatesPlugin extends JavaPlugin {
         GateData data = gates.get(loc);
 
         // If no data is found or if the gate doesn't have the required activation carpet
-        if (data == null || !hasActivationCarpet(gateBlock)) {
-            return;
-        }
-
-        long now = System.currentTimeMillis();
-        // Check if the gate is in cooldown. If the last update was too recent, skip processing.
-        if (lastUpdateTimes.containsKey(loc) && now - lastUpdateTimes.get(loc) < cooldownMs) {
-            return;
-        }
-
-        // Record the time of the current update.
-        lastUpdateTimes.put(loc, now);
+        if (data == null || !hasActivationCarpet(gateBlock)) return;
 
         // Get the output block relative to the gate's facing direction.
-        Block outputBlock = gateBlock.getRelative(data.getFacing());
+        final BlockFace facing = data.getFacing();
+        Block outputBlock = gateBlock.getRelative(facing);
+
+        boolean currentPhysicalState = getRedstoneState(gateBlock, facing);
+
+        // Bypass cooldown for initial state mismatch
+        boolean forceUpdate = (data.getState() != currentPhysicalState);
+
+        // Tick-based cooldown check (2 ticks minimum)
+        Long lastTick = lastUpdateTicks.get(loc);
+        if(lastTick != null && (serverTick - lastTick) < 2) return;
+
+        // Store current tick before processing
+        lastUpdateTicks.put(loc, serverTick);
 
         // If a carpet is present at the standard output location, shift the output block one further block in the facing direction.
         if (carpetTypes.containsKey(outputBlock.getType())) {
-            outputBlock = outputBlock.getRelative(data.getFacing(), 1);
+            outputBlock = outputBlock.getRelative(facing, 1);
         }
 
+        BlockFace leftFacing = GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER);
+        BlockFace rightFacing = GateUtils.rotateClockwise(facing, ROTATION_ORDER);
+
+        boolean leftState;
+        boolean rightState;
+
         // Determine the redstone input states from the left and right sides of the gate.
-        boolean leftState = getRedstoneState(gateBlock, GateUtils.rotateCounterClockwise(data.getFacing(), ROTATION_ORDER));
-        boolean rightState = getRedstoneState(gateBlock, GateUtils.rotateClockwise(data.getFacing(), ROTATION_ORDER));
+        leftState = getRedstoneState(gateBlock, leftFacing);
+        rightState = getRedstoneState(gateBlock, rightFacing);
+
+        // Force false if input block is air
+        if (gateBlock.getRelative(leftFacing).getType() == Material.AIR) leftState = false;
+        if (gateBlock.getRelative(rightFacing).getType() == Material.AIR) rightState = false;
+
         // Calculate the output state based on the gate's type and the input states.
         boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, data);
 
-        // Output debugging information for the gate update.
-        debugGateUpdate(gateBlock, data, leftState, rightState, output);
+        // Always update if:
+        // 1. Physical state differs from logical state (initialization)
+        // 2. Output changed
+        boolean needsUpdate = forceUpdate || (data.getState() != output);
 
-        // Update the stored output state in GateData
-        data.setState(output);
+        if (needsUpdate) {
+            GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
+            data.setState(output);
+            debugGateUpdate(gateBlock, data, leftState, rightState, output);
+        }
 
-        // Play a sound at the gate's location for user feedback.
-        gateBlock.getWorld().playSound(loc, Sound.BLOCK_REDSTONE_TORCH_BURNOUT, 0.1f, 0.1f);
-
-        // Schedule the task to update the redstone power of the output block one tick later.
-        Block finalOutputBlock = outputBlock;
-        Bukkit.getScheduler().runTaskLater(this, () ->
-                GateUtils.setRedstonePower(finalOutputBlock, output ? 15 : 0), 1L);
+        scheduleDependentUpdates(outputBlock, facing);
     }
     //endregion
 
@@ -248,6 +290,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     public boolean getRedstoneState(Block gateBlock, BlockFace face) {
         Block targetBlock = gateBlock.getRelative(face);
         Material type = targetBlock.getType();
+        if (type == Material.AIR) return false;
 
         if (!redstoneCompatibility) {
             return checkStandardRedstoneComponents(targetBlock, type);
@@ -323,20 +366,6 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Utility Methods
-    /// Resets the redstone output of the gate block.
-    ///
-    /// The method retrieves the gate data to determine its facing direction.
-    /// If no data is found, it defaults to NORTH.
-    /// It then sets the redstone power of the block relative to the gate's facing to 0.
-    ///
-    ///
-    /// @param gateBlock the gate block whose output should be reset
-    public void resetOutput(Block gateBlock) {
-        GateData data = gates.get(gateBlock.getLocation());
-        BlockFace facing = (data != null) ? data.getFacing() : BlockFace.NORTH;
-        GateUtils.setRedstonePower(gateBlock.getRelative(facing), 0);
-    }
-
     /// Checks if the gate has an activation carpet.
     ///
     /// The method determines whether there is a carpet block one block above the given gate block.
@@ -427,6 +456,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //region Task Scheduling
     /// Starts all scheduled tasks for gate updates, particles, and processing.
     private void startScheduledTasks() {
+        initializeTickSystem();
         startTimerUpdateTask();
         startParticleTask();
         startUpdateProcessingTask();
@@ -457,23 +487,24 @@ public class LogicGatesPlugin extends JavaPlugin {
         }, 0L, 10L);
     }
 
-    /// Starts a repeating task to process pending gate updates asynchronously.
+    /// Starts a repeating task to process pending gate updates asynchronously
     private void startUpdateProcessingTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            // Copy locations to process and clear the update set
-            Set<Location> toProcess = new HashSet<>(gatesToUpdate);
-            gatesToUpdate.clear();
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            // Process in batches
+            List<Location> batch = new ArrayList<>(gatesToUpdate.size());
+            while(true) {
+                Location loc = gatesToUpdate.poll();
+                if(loc == null) break;
+                batch.add(loc);
+            }
 
-            // Process updates asynchronously to avoid blocking the main thread
-            Bukkit.getScheduler().runTaskAsynchronously(this, () ->
-                    toProcess.forEach(loc -> {
-                        // Only update if the block type is GLASS
-                        if (loc.getBlock().getType() == Material.GLASS) {
-                            Bukkit.getScheduler().runTask(this, () -> updateGate(loc.getBlock()));
-                        }
-                    })
-            );
-        }, 0L, 0L);
+            batch.forEach(loc -> {
+                Block block = loc.getBlock();
+                if(block.getType() == Material.GLASS) {
+                    updateGate(block);
+                }
+            });
+        }, 1L, 1L);
     }
 
     /// Cancels scheduled tasks for timer gate updates and particle effects.
@@ -566,7 +597,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// Returns the set of gate locations that require updates.
     ///
     /// @return the set of gate locations to update
-    public Set<Location> getGatesToUpdate() {
+    public ConcurrentLinkedQueue<Location> getGatesToUpdate() {
         return gatesToUpdate;
     }
 
