@@ -283,6 +283,39 @@ public class GateListener implements Listener {
         Block clicked = event.getClickedBlock();
         if (clicked == null) return;
 
+        // Handle input toggle mode
+        if (plugin.getInputToggleModePlayers().contains(player.getUniqueId())) {
+            event.setCancelled(true);
+
+            if (!player.hasPermission("logicgates.toggleinput")) {
+                plugin.getInputToggleModePlayers().remove(player.getUniqueId());
+                player.sendMessage(plugin.getMessage("errors.no_permission"));
+                return;
+            }
+
+            GateData data = plugin.getGates().get(clicked.getLocation());
+            if (data == null) return;
+
+            if (
+                    data.getType() == GateType.TIMER
+                    || data.getType() == GateType.NOT
+                    || data.getType() == GateType.RS_LATCH
+            ) {
+                plugin.getInputToggleModePlayers().remove(player.getUniqueId());
+                return; // Ignore TIMER, NOT, RS_LATCH gates
+            }
+
+            boolean newState = !data.isThreeInput();
+            data.setThreeInput(newState); // Toggle
+
+            player.sendMessage(plugin.getMessage("gate_input_toggled",
+                    data.getType().name(),
+                    newState ? "3" : "2"));
+
+            plugin.saveGates();
+            plugin.getInputToggleModePlayers().remove(player.getUniqueId());
+        }
+
         // Handle inspection mode
         if (plugin.getInspectionModePlayers().contains(player.getUniqueId())) {
             event.setCancelled(true);

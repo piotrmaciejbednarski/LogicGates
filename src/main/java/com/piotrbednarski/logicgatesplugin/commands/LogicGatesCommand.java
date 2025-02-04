@@ -55,6 +55,7 @@ public class LogicGatesCommand implements CommandExecutor {
             case "give" -> handleGiveCommand(sender, args);
             case "inspect" -> handleInspectCommand(sender);
             case "rotate" -> handleRotateCommand(sender);
+            case "toggleinput" -> handleToggleInputCommand(sender);
             case "colors" -> sendColorInformation(sender);
             case "howto" -> sendHowToInstructions(sender);
             case "help" -> sendHelpInformation(sender);
@@ -84,6 +85,18 @@ public class LogicGatesCommand implements CommandExecutor {
         if (!validateAdminPermission(sender)) return;
         plugin.reloadConfiguration();
         sender.sendMessage("LogicGates config reloaded!");
+    }
+
+    private void handleToggleInputCommand(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(plugin.getMessage("errors.player_only"));
+            return;
+        }
+
+        if (!validatePermission(player, "logicgates.toggleinput")) return;
+
+        plugin.getInputToggleModePlayers().add(player.getUniqueId());
+        player.sendMessage(plugin.getMessage("toggle_input_mode"));
     }
 
     /// Handles item giving command

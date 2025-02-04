@@ -40,6 +40,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private final Set<UUID> debugPlayers = new HashSet<>();
     private final Set<UUID> rotationModePlayers = new HashSet<>();
     private final Set<UUID> inspectionModePlayers = new HashSet<>();
+    private final Set<UUID> inputToggleModePlayers = new HashSet<>();
     private final Set<UUID> cooldownModePlayers = new HashSet<>();
     private final Map<UUID, Integer> pendingCooldowns = new HashMap<>();
 
@@ -637,6 +638,10 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// @return the set of players in inspection mode
     public Set<UUID> getInspectionModePlayers() {
         return inspectionModePlayers;
+    }
+
+    public Set<UUID> getInputToggleModePlayers() {
+        return inputToggleModePlayers;
     }
 
     /// Checks if particle effects are enabled.

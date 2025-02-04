@@ -17,6 +17,9 @@ messages:
     timer_cooldown_mode_enter: "&aClick the timer gate to set the cooldown to %s seconds!"
     timer_cooldown_set_success: "&aThe timer cooldown has been set to %s seconds!"
 
+    toggle_input_mode: "&6Click the gate to change the number of inputs (2/3)"
+    gate_input_toggled: "&6The &e%s &6gate has been changed to %s-input"
+
     redstonecompatibility_usage: "Usage: /logicgates redstonecompatibility <on|off>"
     redstonecompatibility_enabled: "Redstone compatibility has been enabled."
     redstonecompatibility_disabled: "Redstone compatibility has been disabled."
@@ -95,6 +98,9 @@ messages:
     redstonecompatibility_enabled: "Kompatybilność z Redstone została włączona."
     redstonecompatibility_disabled: "Kompatybilność z Redstone została wyłączona."
     redstonecompatibility_invalid_state: "Nieprawidłowy stan. Użyj 'on' lub 'off'."
+
+    toggle_input_mode: "&6Kliknij bramkę, aby zmienić liczbę wejść (2/3)"
+    gate_input_toggled: "&6Bramka &e%s &6została zmieniona na %s-wejściową"
 
     timer_usage: "&cUżycie: /logicgates timer <czas_w_sekundach>"
     timer_cooldown_mode_enter: "&aKliknij timer gate aby ustawić cooldown na %s sekund!"
@@ -175,6 +181,9 @@ messages:
     redstonecompatibility_disabled: "Redstone-Kompatibilität wurde deaktiviert."
     redstonecompatibility_invalid_state: "Ungültiger Zustand. Verwende 'on' oder 'off'."
 
+    toggle_input_mode: "&6Klicke auf das Tor, um die Anzahl der Eingänge zu ändern (2/3)"
+    gate_input_toggled: "&6Das &e%s &6Tor wurde zu einem %s-Eingang geändert"
+
     timer_usage: "&cVerwendung: /logicgates timer <zeit_in_sekunden>"
     timer_cooldown_mode_enter: "&aKlicke auf das Timer-Gate, um die Abklingzeit auf %s Sekunden zu setzen!"
     timer_cooldown_set_success: "&aDie Abklingzeit des Timers wurde auf %s Sekunden gesetzt!"
@@ -253,6 +262,9 @@ messages:
     redstonecompatibility_enabled: "La compatibilidad con Redstone ha sido activada."
     redstonecompatibility_disabled: "La compatibilidad con Redstone ha sido desactivada."
     redstonecompatibility_invalid_state: "Estado inválido. Usa 'on' o 'off'."
+
+    toggle_input_mode: "&6Haz clic en la puerta para cambiar el número de entradas (2/3)"
+    gate_input_toggled: "&6La puerta &e%s &6ha sido cambiada a %s entradas"
 
     timer_usage: "&cUso: /logicgates timer <tiempo_en_segundos>"
     timer_cooldown_mode_enter: "&aHaz clic en el timer gate para establecer el cooldown en %s segundos!"
