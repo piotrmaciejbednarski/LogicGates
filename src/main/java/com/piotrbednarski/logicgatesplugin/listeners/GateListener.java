@@ -41,6 +41,26 @@ public class GateListener implements Listener {
         this.plugin = plugin;
     }
 
+    private BlockFace getPlayerFacingDirection(Player player) {
+        float yaw = player.getLocation().getYaw();
+
+        if (yaw < 0) {
+            yaw += 360;
+        }
+
+        if (yaw >= 315 || yaw < 45) {
+            return BlockFace.SOUTH;
+        } else if (yaw >= 45 && yaw < 135) {
+            return BlockFace.WEST;
+        } else if (yaw >= 135 && yaw < 225) {
+            return BlockFace.NORTH;
+        } else if (yaw >= 225) {
+            return BlockFace.EAST;
+        }
+
+        return BlockFace.NORTH;
+    }
+
     /// Handles the BlockPlaceEvent to create logic gates when a carpet is placed on a glass block.
     ///
     /// @param event The BlockPlaceEvent triggered when a block is placed.
@@ -94,16 +114,17 @@ public class GateListener implements Listener {
 
                 // Create a new gate with the default facing direction (NORTH).
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
-                GateData data = new GateData(BlockFace.NORTH, type);
-                plugin.getGates().put(glassBlockBelow.getLocation(), data);
-                player.sendMessage(plugin.getMessage("gate_created", type.name()));
-
-                // Set default output state of new gate
+                GateData data = new GateData(getPlayerFacingDirection(player), type);
                 boolean defaultState = GateUtils.calculateOutput(type, false, false, data);
-                plugin.getGates().get(glassBlockBelow.getLocation()).setState(defaultState);
+                data.setState(defaultState);
+
+                // Force initial update bypassing cooldown
+                plugin.getGates().put(glassBlockBelow.getLocation(), data);
 
                 plugin.updateGate(glassBlockBelow);
                 plugin.saveGates();
+
+                player.sendMessage(plugin.getMessage("gate_created", type.name()));
             }
         }
 
@@ -116,7 +137,8 @@ public class GateListener implements Listener {
                     return;
                 }
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.updateGate(neighbor), 1L);
+                plugin.updateGate(neighbor);
+
                 // Check the gate's output block for invalid materials.
                 Block outputBlock = neighbor.getRelative(data.getFacing());
                 if (outputBlock.getType() == Material.REDSTONE_WIRE ||
