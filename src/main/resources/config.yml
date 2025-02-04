@@ -10,6 +10,11 @@ redstoneCompatibility: false
 # The language code for messages (e.g., en, pl, es, de).
 language: en
 
+update_checker:
+  enabled: true
+  interval_hours: 24
+  notify_on_join: true
+
 # This section defines the configuration for the carpet items used to create logic gates.
 # Each key corresponds to a GateType and defines the item settings (material, name, lore).
 carpets:

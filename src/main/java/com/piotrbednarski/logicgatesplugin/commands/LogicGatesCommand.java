@@ -2,6 +2,8 @@ package com.piotrbednarski.logicgatesplugin.commands;
 
 import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
+import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
+import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -24,12 +26,17 @@ import java.util.stream.Collectors;
 public class LogicGatesCommand implements CommandExecutor {
 
     private final LogicGatesPlugin plugin;
+    private final ConfigManager configManager;
+    private final UpdateChecker updateChecker;
+
     private static final String ADMIN_PERMISSION = "logicgates.admin";
 
     /// Constructs a new LogicGatesCommand with a reference to the main plugin instance
     /// @param plugin The LogicGatesPlugin instance
-    public LogicGatesCommand(LogicGatesPlugin plugin) {
+    public LogicGatesCommand(LogicGatesPlugin plugin, ConfigManager configManager, UpdateChecker updateChecker) {
         this.plugin = plugin;
+        this.configManager = configManager;
+        this.updateChecker = updateChecker;
     }
 
     /// Executes the given command, returning its success
@@ -53,6 +60,7 @@ public class LogicGatesCommand implements CommandExecutor {
         switch (subCommand) {
             case "debug" -> handleDebugCommand(sender);
             case "give" -> handleGiveCommand(sender, args);
+            case "update" -> handleUpdateCheck(sender);
             case "inspect" -> handleInspectCommand(sender);
             case "rotate" -> handleRotateCommand(sender);
             case "toggleinput" -> handleToggleInputCommand(sender);
@@ -73,6 +81,16 @@ public class LogicGatesCommand implements CommandExecutor {
     }
 
     // region Command Handlers
+
+    private void handleUpdateCheck(CommandSender sender) {
+        if (!sender.hasPermission("logicgates.update")) {
+            sender.sendMessage(plugin.getMessage("errors.no_permission"));
+            return;
+        }
+
+        sender.sendMessage(plugin.getMessage("update_checker.checking"));
+        updateChecker.checkForUpdates(sender);
+    }
 
     /// Handles debug command to toggle debug mode
     /// @param sender Command sender
@@ -110,7 +128,7 @@ public class LogicGatesCommand implements CommandExecutor {
 
         if (!validatePermission(player, "logicgates.give")) return;
 
-        if (!plugin.getGatesConfig().isConfigurationSection("carpets")) {
+        if (!configManager.getConfig().isConfigurationSection("carpets")) {
             player.sendMessage(plugin.getMessage("command_disabled"));
             return;
         }
@@ -218,7 +236,7 @@ public class LogicGatesCommand implements CommandExecutor {
     private void processItemGive(Player player, String gateTypeArg) {
         try {
             GateType type = GateType.valueOf(gateTypeArg.toUpperCase());
-            ConfigurationSection itemSection = plugin.getGatesConfig()
+            ConfigurationSection itemSection = configManager.getConfig()
                     .getConfigurationSection("carpets." + type.name() + ".item");
 
             if (itemSection == null) {

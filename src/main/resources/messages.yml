@@ -8,6 +8,15 @@ messages:
       player_only: "&cPlayer-only command!"
       command_usage: "&cUsage: /logicgates [help|give|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]"
       not_timer_gate: "&cThis is not a timer gate!"
+    update_checker:
+      checking: "&6Checking for updates..."
+      available: "&eAn update is available! New version: &6%latest% &e(current: &c%current%&e)"
+      disabled: "&cUpdate checker is disabled in config"
+      failed: "&cFailed to check for updates"
+      up_to_date: "&aYou're running the latest version!"
+      notify_join: "&eYour plugin is outdated! Latest: &6%latest% &e- Download: &n%url%"
+      success: "&aUpdate check completed successfully"
+
     gate_created: "&aCreated %s gate!"
     gate_removed: "&aGate successfully removed!"
     rotate_mode: "&6Click gate to rotate!"

@@ -7,6 +7,7 @@ import com.piotrbednarski.logicgatesplugin.model.GateType;
 import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.GateUtils;
 import com.piotrbednarski.logicgatesplugin.util.GatesConfigManager;
+import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,6 +77,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private BukkitTask particleTask;
     private ConfigManager configManager;
     private GatesConfigManager gatesConfigManager;
+    private UpdateChecker updateChecker;
     //endregion
 
     //region Plugin Lifecycle
@@ -84,6 +86,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         initializeConfigFiles();
         configManager = new ConfigManager(this);
         gatesConfigManager = new GatesConfigManager(this);
+        updateChecker = new UpdateChecker(this);
 
         // Load configuration and gates
         configManager.loadPluginSettings();
@@ -103,6 +106,12 @@ public class LogicGatesPlugin extends JavaPlugin {
                         getDescription().getAPIVersion()
                 )
         );
+
+        // Automatic update check on startup
+        if (updateChecker.shouldCheckAutomatically()) {
+            getLogger().info("Performing automatic update check...");
+            updateChecker.checkForUpdates(null);
+        }
     }
 
     @Override
@@ -131,11 +140,11 @@ public class LogicGatesPlugin extends JavaPlugin {
 
     //region Component Registration
     private void registerCommands() {
-        Objects.requireNonNull(getCommand("logicgates")).setExecutor(new LogicGatesCommand(this));
+        Objects.requireNonNull(getCommand("logicgates")).setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
     }
 
     private void registerEventListeners() {
-        getServer().getPluginManager().registerEvents(new GateListener(this), this);
+        getServer().getPluginManager().registerEvents(new GateListener(this, configManager, updateChecker), this);
     }
     //endregion
 
@@ -712,13 +721,6 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// @return the messages configuration
     public FileConfiguration getMessages() {
         return YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
-    }
-
-    /// Loads and returns the gates configuration from the configured file.
-    ///
-    /// @return the gates configuration
-    public FileConfiguration getGatesConfig() {
-        return YamlConfiguration.loadConfiguration(new File(getDataFolder(), ConfigManager.CONFIG_FILE_NAME));
     }
 
     /// Converts a Location object to its string representation.

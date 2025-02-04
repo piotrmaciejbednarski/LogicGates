@@ -3,7 +3,9 @@ package com.piotrbednarski.logicgatesplugin.listeners;
 import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
 import com.piotrbednarski.logicgatesplugin.model.GateData;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
+import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.GateUtils;
+import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
 public class GateListener implements Listener {
 
     private final LogicGatesPlugin plugin;
+    private final ConfigManager configManager;
+    private final UpdateChecker updateChecker;
 
     // Define the rotation order for gate directions (North -> East -> South -> West)
     public static final BlockFace[] ROTATION_ORDER = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
@@ -37,8 +42,10 @@ public class GateListener implements Listener {
     /// Constructor for GateListener.
     ///
     /// @param plugin The main plugin instance.
-    public GateListener(LogicGatesPlugin plugin) {
+    public GateListener(LogicGatesPlugin plugin, ConfigManager configManager, UpdateChecker updateChecker) {
         this.plugin = plugin;
+        this.configManager = configManager;
+        this.updateChecker = updateChecker;
     }
 
     private BlockFace getPlayerFacingDirection(Player player) {
@@ -72,9 +79,9 @@ public class GateListener implements Listener {
         // Check if the placed block is a carpet that represents a logic gate
         if (plugin.getCarpetTypes().containsKey(placedBlock.getType())) {
             // Verify if the item used to place the block matches the configuration
-            if (plugin.getGatesConfig().isConfigurationSection("carpets")) {
+            if (configManager.getConfig().isConfigurationSection("carpets")) {
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
-                ConfigurationSection gateSection = plugin.getGatesConfig().getConfigurationSection("carpets." + type.name());
+                ConfigurationSection gateSection = configManager.getConfig().getConfigurationSection("carpets." + type.name());
                 if (gateSection != null && gateSection.isConfigurationSection("item")) {
                     ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
                     assert itemSection != null;
@@ -235,7 +242,7 @@ public class GateListener implements Listener {
     }
 
     private ItemStack createGateItem(GateType type) {
-        ConfigurationSection gateSection = plugin.getGatesConfig().getConfigurationSection("carpets." + type.name());
+        ConfigurationSection gateSection = configManager.getConfig().getConfigurationSection("carpets." + type.name());
         if (gateSection != null && gateSection.isConfigurationSection("item")) {
             ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
             Material material = Material.matchMaterial(itemSection.getString("material", ""));
@@ -258,6 +265,20 @@ public class GateListener implements Listener {
             return item;
         }
         return null;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (configManager.getConfig().getBoolean("update_checker.notify_on_join") &&
+                updateChecker.isUpdateAvailable() &&
+                event.getPlayer().hasPermission("logicgates.update")) {
+
+            String message = plugin.getMessage("update_checker.notify_join")
+                    .replace("%latest%", updateChecker.getLatestVersion())
+                    .replace("%url%", updateChecker.getDownloadUrl());
+
+            event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        }
     }
 
     /// Handles the BlockRedstoneEvent to update gates when redstone power changes.
