@@ -103,21 +103,21 @@ public final class GateUtils {
                 long currentTime = System.currentTimeMillis();
                 long interval = data.getInterval();
                 if (currentTime - data.getLastToggleTime() >= interval) {
-                    data.setState(!data.isState());
+                    data.setState(!data.getState());
                     data.setLastToggleTime(currentTime);
                 }
-                yield data.isState();
+                yield data.getState();
             }
             case RS_LATCH -> {
                 if (input1 && input2) {
                     // Invalid state: maintain current state
-                    yield data.isState();
+                    yield data.getState();
                 } else if (input1) {
                     data.setState(true);
                 } else if (input2) {
                     data.setState(false);
                 }
-                yield data.isState();
+                yield data.getState();
             }
             default -> false;                      // Unknown gate type
         };
@@ -181,6 +181,7 @@ public final class GateUtils {
                     }
                 }
             }
+            block.getState().update(true, true);
         } catch (Exception e) {
             Bukkit.getLogger().warning("Failed to set redstone power for block: " + block.getType());
         }
