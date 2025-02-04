@@ -334,7 +334,7 @@ public class LogicGatesCommand implements CommandExecutor {
         sendMultipleMessages(sender, "help_colors", "help_howto", "help_rotate",
                 "help_inspect", "help_particles", "help_save",
                 "help_fixparticles", "help_language", "help_redstonecompatibility",
-                "help_give", "help_timer");
+                "help_give", "help_toggleinput", "help_timer");
     }
 
     /// Sends author information to sender
