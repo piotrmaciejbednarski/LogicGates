@@ -115,7 +115,7 @@ public class GateListener implements Listener {
                 // Create a new gate with the default facing direction (NORTH)
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
                 GateData data = new GateData(getPlayerFacingDirection(player), type);
-                boolean defaultState = GateUtils.calculateOutput(type, false, false, data);
+                boolean defaultState = GateUtils.calculateOutput(type, false, false, false, data);
                 data.setState(defaultState);
 
                 // Force initial update bypassing cooldown
@@ -300,11 +300,21 @@ public class GateListener implements Listener {
             // Get input states using debug logic
             BlockFace leftInputDir = GateUtils.rotateCounterClockwise(data.getFacing(), ROTATION_ORDER);
             BlockFace rightInputDir = GateUtils.rotateClockwise(data.getFacing(), ROTATION_ORDER);
+            BlockFace backInputDir = data.getFacing().getOppositeFace();
+
             boolean leftState = plugin.getRedstoneState(clicked, leftInputDir);
             boolean rightState = plugin.getRedstoneState(clicked, rightInputDir);
+            boolean backState = false;
+
+            if (data.isThreeInput()) {
+                backState = plugin.getRedstoneState(clicked, backInputDir);
+                if (clicked.getRelative(backInputDir).getType() == Material.AIR) {
+                    backState = false;
+                }
+            }
 
             // Calculate output using unified logic
-            boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, data);
+            boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, backState, data);
 
             // Format inspection message
             player.sendMessage(plugin.getMessage("inspect_header"));

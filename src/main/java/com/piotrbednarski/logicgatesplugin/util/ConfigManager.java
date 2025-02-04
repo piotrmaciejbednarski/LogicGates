@@ -79,6 +79,7 @@ public class ConfigManager {
         config.set(baseKey + ".state", gateData.getState());
         config.set(baseKey + ".interval", gateData.getInterval());
         config.set(baseKey + ".lastToggleTime", gateData.getLastToggleTime());
+        config.set(baseKey + ".isThreeInput", gateData.isThreeInput());
 
         saveToFile();
     }
@@ -112,12 +113,14 @@ public class ConfigManager {
                             boolean state = config.getBoolean(CONFIG_GATES + "." + key + ".state", false);
                             long interval = config.getLong(CONFIG_GATES + "." + key + ".interval", 1000);
                             long lastToggleTime = config.getLong(CONFIG_GATES + "." + key + ".lastToggleTime", 0);
+                            boolean isThreeInput = config.getBoolean(CONFIG_GATES + "." + key + ".isThreeInput", false);
 
                             if (facingStr != null && typeStr != null) {
                                 GateData data = new GateData(
                                         org.bukkit.block.BlockFace.valueOf(facingStr),
                                         GateType.valueOf(typeStr)
                                 );
+                                data.setThreeInput(isThreeInput);
                                 data.setState(state);
                                 data.setInterval(interval);
                                 data.setLastToggleTime(lastToggleTime);

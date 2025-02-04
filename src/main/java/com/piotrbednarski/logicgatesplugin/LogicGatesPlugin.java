@@ -251,20 +251,31 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         BlockFace leftFacing = GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER);
         BlockFace rightFacing = GateUtils.rotateClockwise(facing, ROTATION_ORDER);
+        BlockFace backFacing = facing.getOppositeFace();
 
         boolean leftState;
         boolean rightState;
+        boolean backState;
 
         // Determine the redstone input states from the left and right sides of the gate.
         leftState = getRedstoneState(gateBlock, leftFacing);
         rightState = getRedstoneState(gateBlock, rightFacing);
+        backState = false;
+
+        if (data.isThreeInput()) {
+            backState = getRedstoneState(gateBlock, backFacing);
+            if (gateBlock.getRelative(backFacing).getType() == Material.AIR) {
+                backState = false;
+            }
+        }
 
         // Force false if input block is air
         if (gateBlock.getRelative(leftFacing).getType() == Material.AIR) leftState = false;
         if (gateBlock.getRelative(rightFacing).getType() == Material.AIR) rightState = false;
+        if (gateBlock.getRelative(backFacing).getType() == Material.AIR) backState = false;
 
         // Calculate the output state based on the gate's type and the input states.
-        boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, data);
+        boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, backState, data);
 
         // Always update if:
         // 1. Physical state differs from logical state (initialization)
