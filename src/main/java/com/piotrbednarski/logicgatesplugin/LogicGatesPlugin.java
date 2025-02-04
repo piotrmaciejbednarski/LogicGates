@@ -284,7 +284,11 @@ public class LogicGatesPlugin extends JavaPlugin {
         // Always update if:
         // 1. Physical state differs from logical state (initialization)
         // 2. Output changed
-        boolean needsUpdate = forceUpdate || (data.getState() != output);
+
+        boolean needsUpdate = true;
+
+        // Ignore checking when RS_LATCH
+        if (data.getType() != GateType.RS_LATCH) needsUpdate = forceUpdate || (data.getState() != output);
 
         if (needsUpdate) {
             GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
