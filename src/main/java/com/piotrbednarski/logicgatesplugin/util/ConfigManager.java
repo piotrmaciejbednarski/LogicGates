@@ -78,7 +78,7 @@ public class ConfigManager {
         // Store gate properties in nested structure
         config.set(baseKey + ".facing", gateData.getFacing().name());
         config.set(baseKey + ".type", gateData.getType().name());
-        config.set(baseKey + ".state", gateData.isState());
+        config.set(baseKey + ".state", gateData.getState());
         config.set(baseKey + ".interval", gateData.getInterval());
         config.set(baseKey + ".lastToggleTime", gateData.getLastToggleTime());
 
