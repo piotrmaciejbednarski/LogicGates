@@ -66,7 +66,6 @@ public class LogicGatesPlugin extends JavaPlugin {
     private boolean particlesEnabled = true;
     private int particleViewDistance = 16;
     private boolean redstoneCompatibility = false;
-    private long cooldownMs = 100;
     private String defaultLang = "en";
     //endregion
 

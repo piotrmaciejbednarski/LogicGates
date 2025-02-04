@@ -64,7 +64,6 @@ public class ConfigManager {
         plugin.setParticlesEnabled(config.getBoolean(CONFIG_PARTICLES_ENABLED, true));
         plugin.setParticleViewDistance(config.getInt(CONFIG_PARTICLES_VIEW_DISTANCE, 16));
         plugin.setDefaultLang(config.getString(CONFIG_LANGUAGE, "en"));
-        plugin.setCooldownMs(config.getLong(CONFIG_COOLDOWN_MS, 100));
     }
 
     /// Saves gate data to configuration
