@@ -105,5 +105,3 @@ carpets:
       lore:
         - '&7Creates a Timer gate'
         - '&7Generates signal every 1 second'
-
-gates:

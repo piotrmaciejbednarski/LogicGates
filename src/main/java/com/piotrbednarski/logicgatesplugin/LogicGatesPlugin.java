@@ -6,6 +6,7 @@ import com.piotrbednarski.logicgatesplugin.model.GateData;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
 import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.GateUtils;
+import com.piotrbednarski.logicgatesplugin.util.GatesConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -74,6 +75,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private BukkitTask timerGateUpdateTask;
     private BukkitTask particleTask;
     private ConfigManager configManager;
+    private GatesConfigManager gatesConfigManager;
     //endregion
 
     //region Plugin Lifecycle
@@ -81,10 +83,11 @@ public class LogicGatesPlugin extends JavaPlugin {
     public void onEnable() {
         initializeConfigFiles();
         configManager = new ConfigManager(this);
+        gatesConfigManager = new GatesConfigManager(this);
 
         // Load configuration and gates
         configManager.loadPluginSettings();
-        configManager.loadGates(gates);
+        gatesConfigManager.loadGates(gates);
 
         // Register plugin components
         registerCommands();
@@ -419,9 +422,7 @@ public class LogicGatesPlugin extends JavaPlugin {
 
     /// Saves all gates to the configuration file.
     public void saveGates() {
-        // Clear previous gate configuration and save current gates
-        configManager.getConfig().set(ConfigManager.CONFIG_GATES, null);
-        gates.forEach((loc, data) -> configManager.saveGate(loc, data));
+        gatesConfigManager.saveGates(gates);
         configManager.saveToFile();
     }
 
@@ -731,9 +732,8 @@ public class LogicGatesPlugin extends JavaPlugin {
     }
 
     public void reloadConfiguration() {
-        ConfigManager configManager = new ConfigManager(this);
         configManager.reloadConfiguration();
-        configManager.loadGates(gates);
+        gatesConfigManager.loadGates(gates);
     }
     //endregion
 }
