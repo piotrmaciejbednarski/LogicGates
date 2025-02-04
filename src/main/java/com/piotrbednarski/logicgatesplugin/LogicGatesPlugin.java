@@ -124,8 +124,8 @@ public class LogicGatesPlugin extends JavaPlugin {
         File messagesFile = new File(getDataFolder(), "messages.yml");
         if (!messagesFile.exists()) saveResource("messages.yml", false);
 
-        File gatesFile = new File(getDataFolder(), ConfigManager.CONFIG_FILE_NAME);
-        if (!gatesFile.exists()) saveResource(ConfigManager.CONFIG_FILE_NAME, false);
+        File configFile = new File(getDataFolder(), ConfigManager.CONFIG_FILE_NAME);
+        if (!configFile.exists()) saveResource(ConfigManager.CONFIG_FILE_NAME, false);
     }
     //endregion
 
