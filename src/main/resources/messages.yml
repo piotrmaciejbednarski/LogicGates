@@ -1,6 +1,6 @@
 messages:
   en:
-    prefix: "&8[&6LogicGates&8] &r" # Darker gray prefix, gold plugin name
+    prefix: "&8[&6LogicGates&8] &r"
     errors:
       no_permission: "&cYou don't have permission!"
       invalid_subcommand: "&cUnknown command. Use /logicgates help"
@@ -29,7 +29,7 @@ messages:
     toggle_input_mode: "&6Click the gate to change the number of inputs (2/3)"
     gate_input_toggled: "&6The &e%s &6gate has been changed to %s-input"
 
-    redstonecompatibility_usage: "&cUsage: /logicgates redstonecompatibility <on|off>" # Consistent red
+    redstonecompatibility_usage: "&cUsage: /logicgates redstonecompatibility <on|off>"
     redstonecompatibility_enabled: "&aRedstone compatibility has been enabled."
     redstonecompatibility_disabled: "&cRedstone compatibility has been disabled."
     redstonecompatibility_invalid_state: "&cInvalid state. Use 'on' or 'off'."
@@ -41,7 +41,7 @@ messages:
     invalid_gate_type: "&cInvalid gate type: %s."
     give_usage: "&cUsage: /logicgates give <gateType>"
 
-    colors_header: "&8==== &6Logic Gates - Colors &8====" # Darker gray separators
+    colors_header: "&8==== &6Logic Gates - Colors &8===="
     howto_header: "&8==== &6Logic Gates - How to? &8===="
     help_header: "&8==== &6Logic Gates Help &8===="
     help_colors: "&e/logicgates colors - Logic gates list and carpet colors"
