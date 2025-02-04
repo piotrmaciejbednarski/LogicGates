@@ -10,7 +10,7 @@ website: https://bednarskiwsieci.pl
 commands:
   logicgates:
     description: LogicGates Plugin
-    usage: /logicgates [help|give|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]
+    usage: /logicgates [help|give|update|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]
     aliases: [lg]
 permissions:
   logicgates.place:
