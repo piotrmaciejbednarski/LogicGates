@@ -289,7 +289,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         if (needsUpdate) {
             GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
             data.setState(output);
-            debugGateUpdate(gateBlock, data, leftState, rightState, output);
+            debugGateUpdate(gateBlock, data, leftState, rightState, backState, output);
         }
 
         scheduleDependentUpdates(outputBlock, facing);
@@ -539,7 +539,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// @param rightInput  the state of the right redstone input
     /// @param outputResult the computed output state of the gate
     public void debugGateUpdate(Block gateBlock, GateData data,
-                                boolean leftInput, boolean rightInput, boolean outputResult) {
+                                boolean leftInput, boolean rightInput, boolean backInput, boolean outputResult) {
         // Exit early if there are no debug players to notify
         if (debugPlayers.isEmpty()) return;
 
@@ -550,6 +550,7 @@ public class LogicGatesPlugin extends JavaPlugin {
             &7Facing:&f %s
             &7Input 1:&f %s
             &7Input 2:&f %s
+            &7Input 3:&f %s
             &7Output:&f %s
             """,
                 formatLocation(gateBlock.getLocation()),
@@ -557,6 +558,7 @@ public class LogicGatesPlugin extends JavaPlugin {
                 data.getFacing().name(),
                 formatRedstoneState(leftInput),
                 formatRedstoneState(rightInput),
+                formatRedstoneState(backInput),
                 formatRedstoneState(outputResult)
         );
 
