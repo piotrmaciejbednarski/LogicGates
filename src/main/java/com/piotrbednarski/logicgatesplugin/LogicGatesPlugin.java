@@ -110,9 +110,13 @@ public class LogicGatesPlugin extends JavaPlugin {
         );
 
         // Automatic update check on startup
-        if (updateChecker.shouldCheckAutomatically()) {
-            getLogger().info("Performing automatic update check...");
-            updateChecker.checkForUpdates(null);
+        try {
+            if (updateChecker.shouldCheckAutomatically()) {
+                getLogger().info("Performing automatic update check...");
+                updateChecker.checkForUpdates(null);
+            }
+        } catch (Exception e) {
+            getLogger().severe("An error occurred while checking for updates");
         }
 
         // Register WorldEdit Integration
