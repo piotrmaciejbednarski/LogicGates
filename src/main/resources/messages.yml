@@ -15,7 +15,7 @@ messages:
       disabled: "&cUpdate checker is disabled in config"
       failed: "&cFailed to check for updates"
       up_to_date: "&aYou're running the latest version!"
-      notify_join: "&eYour plugin is outdated! Latest: &6%latest% &e- Download: &n%url%"
+      notify_join: "&eYour plugin is outdated! Latest: &6%latest%\n&eDownload: &n%url%"
       success: "&aUpdate check completed successfully"
 
     gui_title: "&0Choose gate type"
