@@ -499,7 +499,7 @@ public class LogicGatesCommand implements CommandExecutor {
         }
 
         String languageCode = args[1].toLowerCase();
-        if (languageCode.equals("en") || languageCode.equals("pl")) {
+        if (plugin.getMessages().get("messages." + languageCode) != null) {
             plugin.setDefaultLang(languageCode);
             plugin.saveGates();
             sender.sendMessage(plugin.getMessage("language_changed"));
