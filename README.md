@@ -5,14 +5,14 @@
 
 A feature-rich implementation of logic gates fully compatible with Minecraft Redstone systems. Create complex circuits with ease using intuitive gates and seamless Redstone integration. Perfect for technical servers and redstone engineers.
 
-🔗 **Check documentation**: [https://piotrmaciejbednarski.github.io/logicgates-docs/](https://piotrmaciejbednarski.github.io/logicgates-docs/)
+🔗 **Check documentation**: [https://logicgates-docs.vercel.app/](https://logicgates-docs.vercel.app/)
 
 ## Installation
 
 1. Download the latest `LogicGates.jar` from [Releases](https://github.com/piotrmaciejbednarski/logicgates/releases)
 2. Place the JAR file in your server's `plugins/` directory
 3. Restart your Minecraft server
-4. (Optional) Configure `gates.yml` for advanced settings
+4. (Optional) Configure `config.yml` for advanced settings
 
 ## Contributing
 
