@@ -25,6 +25,10 @@ We welcome contributions! Please follow these steps:
 
 Report issues [here](https://github.com/piotrmaciejbednarski/logicgates/issues)
 
+## Links
+
+- [Spigotmc.org](https://www.spigotmc.org/resources/logicgates-1-16-1-21-redstone-logic-gates-in-one-block.122253/)
+
 ## License
 
 Distributed under MIT License. See [LICENSE](https://mit-license.org/) for details.
