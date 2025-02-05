@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,7 +188,9 @@ public class LogicGatesCommand implements CommandExecutor {
         player.sendMessage(plugin.getMessage("inspect_mode"));
     }
 
-    /// Handles rotation mode activation
+    //region Rotation mode
+
+    /// Handles rotation mode activation and gives the wand
     /// @param sender Command sender
     private void handleRotateCommand(CommandSender sender) {
         if (!(sender instanceof Player player)) {
@@ -195,11 +198,49 @@ public class LogicGatesCommand implements CommandExecutor {
             return;
         }
 
+        // Check if the player has permission to use the command
         if (!validatePermission(player, "logicgates.rotate")) return;
 
-        plugin.getRotationModePlayers().add(player.getUniqueId());
-        player.sendMessage(plugin.getMessage("rotate_mode"));
+        // Check if the player already has a rotation wand in their inventory
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && isRotationWand(item)) {
+                // If the player already has a rotation wand, send a message to the player
+                // saying that they already have a rotation wand
+                player.sendMessage(plugin.getMessage("rotate_already_has_wand"));
+                return;
+            }
+        }
+
+        // Create a new rotation wand
+        ItemStack wand = createRotationWand();
+
+        // Add the rotation wand to the player's inventory
+        player.getInventory().addItem(wand);
+
+        // Send a message to the player
+        player.sendMessage(plugin.getMessage("rotate_wand_received"));
     }
+
+    private ItemStack createRotationWand() {
+        ItemStack wand = new ItemStack(Material.STICK);
+        ItemMeta meta = wand.getItemMeta();
+        meta.setDisplayName(ChatColor.GREEN + "Rotation Wand");
+        meta.setLore(Arrays.asList(ChatColor.GRAY + "Right-click a logic gate to rotate it."));
+        meta.setCustomModelData(1450); // Unique ID
+        meta.setUnbreakable(true);
+        wand.setItemMeta(meta);
+        return wand;
+    }
+
+    public boolean isRotationWand(ItemStack item) {
+        if (item == null || item.getType() != Material.STICK) return false;
+        ItemMeta meta = item.getItemMeta();
+
+        // Find by unique id
+        return meta != null && meta.hasCustomModelData() && meta.getCustomModelData() == 1450;
+    }
+
+    //endregion
 
     /// Handles plugin configuration save
     /// @param sender Command sender

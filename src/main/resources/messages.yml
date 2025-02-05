@@ -8,6 +8,7 @@ messages:
       player_only: "&cPlayer-only command!"
       command_usage: "&cUsage: /logicgates [help|give|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]"
       not_timer_gate: "&cThis is not a timer gate!"
+      not_a_gate: "&cThis block is not a valid logic gate!"
     update_checker:
       checking: "&6Checking for updates..."
       available: "&eAn update is available! New version: &6%latest% &e(current: &c%current%&e)"
@@ -19,7 +20,9 @@ messages:
 
     gate_created: "&aCreated %s gate!"
     gate_removed: "&aGate successfully removed!"
-    rotate_mode: "&6Click gate to rotate!"
+    rotate_wand_received: "&6You have received the Rotation Wand!\n&lRight-click a gate to rotate it"
+    rotate_already_has_wand: "&cYou already have the Rotation Wand in your inventory!"
+    gate_rotated: "&aGate rotated! New facing: %s"
     inspect_mode: "&dClick gate to inspect!"
 
     timer_usage: "&cUsage: /logicgates timer <time_in_seconds>"
@@ -30,8 +33,8 @@ messages:
     gate_input_toggled: "&6The &e%s &6gate has been changed to %s-input"
 
     redstonecompatibility_usage: "&cUsage: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "&aRedstone compatibility has been enabled."
-    redstonecompatibility_disabled: "&cRedstone compatibility has been disabled."
+    redstonecompatibility_enabled: "&aRedstone compatibility has been enabled"
+    redstonecompatibility_disabled: "&cRedstone compatibility has been disabled"
     redstonecompatibility_invalid_state: "&cInvalid state. Use 'on' or 'off'."
 
     command_disabled: "&cThis command is disabled because carpet items are not configured."
@@ -86,5 +89,4 @@ messages:
     redstone_active: "&aActive"
     redstone_inactive: "&cNot active"
 
-    gate_rotated: "&aGate rotated! New facing: %s"
     invalid_output_material: "&cInvalid material detected at the gate output! Using redstone, repeater, or redstone torch may not work or cause malfunctions. Use a button, lever, or observer instead."

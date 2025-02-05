@@ -1,6 +1,7 @@
 package com.piotrbednarski.logicgatesplugin.listeners;
 
 import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
+import com.piotrbednarski.logicgatesplugin.commands.LogicGatesCommand;
 import com.piotrbednarski.logicgatesplugin.model.GateData;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
 import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
@@ -15,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -399,20 +401,45 @@ public class GateListener implements Listener {
             }
         }
 
-        // Handle rotation mode
-        if (plugin.getRotationModePlayers().contains(player.getUniqueId())) {
-            if (!player.hasPermission("logicgates.rotate")) {
-                plugin.getRotationModePlayers().remove(player.getUniqueId());
+        // Handle rotation wand usage
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getItem() != null) {
+            ItemStack item = event.getItem();
+
+            LogicGatesCommand logicGatesCommand = new LogicGatesCommand(plugin, configManager, updateChecker);
+
+            // Check if the item is a rotation wand
+            if (logicGatesCommand.isRotationWand(item)) {
+                // Cancel the default block interaction
                 event.setCancelled(true);
-                player.sendMessage(plugin.getMessage("errors.no_permission"));
-                return;
-            }
-            if (clicked.getType() == Material.GLASS && plugin.hasActivationCarpet(clicked)) {
-                plugin.rotateGate(clicked);
-                player.sendMessage(plugin.getMessage("gate_rotated", plugin.getGates().get(clicked.getLocation()).getFacing().name()));
-                plugin.saveGates();
-                plugin.getRotationModePlayers().remove(player.getUniqueId());
-                event.setCancelled(true);
+
+                // Check if the player has permission to rotate gates
+                if (!player.hasPermission("logicgates.rotate")) {
+                    player.sendMessage(plugin.getMessage("errors.no_permission"));
+                    return;
+                }
+
+                // Check if a block was clicked
+                if (clicked == null) return;
+
+                // Check if the clicked block is a gate
+                if (clicked.getType() == Material.GLASS && plugin.hasActivationCarpet(clicked)) {
+                    // Get the gate data
+                    GateData data = plugin.getGates().get(clicked.getLocation());
+                    if (data != null) {
+                        // Rotate the gate
+                        plugin.rotateGate(clicked);
+                        // Send a message to the player indicating the gate's new facing direction
+                        player.sendMessage(plugin.getMessage("gate_rotated", data.getFacing().name()));
+                        // Save the updated gate data
+                        plugin.saveGates();
+                    } else {
+                        // Send a message to the player indicating that the clicked block is not a gate
+                        player.sendMessage(plugin.getMessage("errors.not_a_gate"));
+                    }
+                } else {
+                    // Send a message to the player indicating that the clicked block is not a gate
+                    player.sendMessage(plugin.getMessage("errors.not_a_gate"));
+                }
             }
         }
     }
