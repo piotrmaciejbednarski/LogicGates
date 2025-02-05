@@ -10,6 +10,7 @@ import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,11 +21,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 import java.util.Objects;
@@ -440,6 +444,45 @@ public class GateListener implements Listener {
                     // Send a message to the player indicating that the clicked block is not a gate
                     player.sendMessage(plugin.getMessage("errors.not_a_gate"));
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+
+        // Check if it's our GUI
+        String guiTitle = ChatColor.translateAlternateColorCodes('&', plugin.getMessageWithoutPrefix("gui_title"));
+        if (!event.getView().getTitle().equals(guiTitle)) return;
+
+        event.setCancelled(true);
+
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+        // Check if the item has the correct tag
+        ItemMeta meta = clickedItem.getItemMeta();
+        PersistentDataContainer data = meta.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(plugin, "logic_gate");
+
+        if (!data.has(key, PersistentDataType.STRING)) return;
+        String gateType = data.get(key, PersistentDataType.STRING);
+
+        // Create a new item from the configuration
+        ConfigurationSection gateSection = configManager.getConfig()
+                .getConfigurationSection("carpets." + gateType);
+
+        if (gateSection != null) {
+            ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
+            Material material = Material.matchMaterial(itemSection.getString("material", ""));
+
+            LogicGatesCommand logicGatesCommand = new LogicGatesCommand(plugin, configManager, updateChecker);
+            if (material != null) {
+                ItemStack itemToGive = logicGatesCommand.createConfiguredItem(itemSection, material);
+                player.getInventory().addItem(itemToGive);
+                player.sendMessage(plugin.getMessage("item_given", gateType));
             }
         }
     }

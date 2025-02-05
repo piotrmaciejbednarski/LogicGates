@@ -8,17 +8,22 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /// Handles execution of the /logicgates command and its subcommands.
@@ -59,12 +64,11 @@ public class LogicGatesCommand implements CommandExecutor {
         String subCommand = args[0].toLowerCase();
         switch (subCommand) {
             case "debug" -> handleDebugCommand(sender);
-            case "give" -> handleGiveCommand(sender, args);
+            case "menu" -> handleGUI(sender);
             case "update" -> handleUpdateCheck(sender);
             case "inspect" -> handleInspectCommand(sender);
             case "rotate" -> handleRotateCommand(sender);
             case "toggleinput" -> handleToggleInputCommand(sender);
-            case "colors" -> sendColorInformation(sender);
             case "howto" -> sendHowToInstructions(sender);
             case "help" -> sendHelpInformation(sender);
             case "author" -> sendAuthorInfo(sender);
@@ -114,10 +118,9 @@ public class LogicGatesCommand implements CommandExecutor {
         player.sendMessage(plugin.getMessage("toggle_input_mode"));
     }
 
-    /// Handles item giving command
+    /// Handles gate selection from GUI
     /// @param sender Command sender
-    /// @param args Command arguments
-    private void handleGiveCommand(CommandSender sender, String[] args) {
+    private void handleGUI(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(plugin.getMessage("errors.player_only"));
             return;
@@ -130,12 +133,67 @@ public class LogicGatesCommand implements CommandExecutor {
             return;
         }
 
-        if (args.length < 2) {
-            player.sendMessage(plugin.getMessage("give_usage"));
+        openGateGUI(player);
+    }
+
+    private void openGateGUI(Player player) {
+        ConfigurationSection carpetsSection = configManager.getConfig().getConfigurationSection("carpets");
+        if (carpetsSection == null) {
+            player.sendMessage(plugin.getMessage("command_disabled"));
             return;
         }
 
-        processItemGive(player, args[1]);
+        Set<String> gateKeys = carpetsSection.getKeys(false);
+        if (gateKeys.isEmpty()) {
+            player.sendMessage(plugin.getMessage("no_gates_configured"));
+            return;
+        }
+
+        // Calculate GUI size
+        int size = (int) (Math.ceil(gateKeys.size() / 9.0) * 9);
+        size = Math.max(9, Math.min(54, size));
+
+        Inventory gui = Bukkit.createInventory(
+                null,
+                size,
+                ChatColor.translateAlternateColorCodes('&', plugin.getMessageWithoutPrefix("gui_title"))
+        );
+
+        for (String gateKey : gateKeys) {
+            ConfigurationSection gateSection = carpetsSection.getConfigurationSection(gateKey);
+            if (gateSection == null) continue;
+
+            ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
+            if (itemSection == null) continue;
+
+            Material material = Material.matchMaterial(itemSection.getString("material", ""));
+            if (material == null) continue;
+
+            try {
+                GateType type = GateType.valueOf(gateKey.toUpperCase());
+                ItemStack item = createGUIItem(itemSection, material, type);
+                gui.addItem(item);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Invalid gate type in config: " + gateKey);
+            }
+        }
+
+        player.openInventory(gui);
+    }
+
+    private ItemStack createGUIItem(ConfigurationSection itemSection, Material material, GateType type) {
+        ItemStack item = createConfiguredItem(itemSection, material);
+        ItemMeta meta = item.getItemMeta();
+
+        // Add gate identifier
+        meta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "logic_gate"),
+                PersistentDataType.STRING,
+                type.name()
+        );
+
+        item.setItemMeta(meta);
+        return item;
     }
 
     /// Handles changing timer cooldown setting
@@ -267,40 +325,11 @@ public class LogicGatesCommand implements CommandExecutor {
         return false;
     }
 
-    /// Creates and gives gate item to player based on configuration
-    /// @param player Target player
-    /// @param gateTypeArg Gate type argument
-    private void processItemGive(Player player, String gateTypeArg) {
-        try {
-            GateType type = GateType.valueOf(gateTypeArg.toUpperCase());
-            ConfigurationSection itemSection = configManager.getConfig()
-                    .getConfigurationSection("carpets." + type.name() + ".item");
-
-            if (itemSection == null) {
-                player.sendMessage(plugin.getMessage("no_config_for_gate", type.name()));
-                return;
-            }
-
-            Material material = Material.matchMaterial(itemSection.getString("material", ""));
-            if (material == null) {
-                player.sendMessage(plugin.getMessage("invalid_material_in_config",
-                        itemSection.getString("material")));
-                return;
-            }
-
-            ItemStack item = createConfiguredItem(itemSection, material);
-            player.getInventory().addItem(item);
-            player.sendMessage(plugin.getMessage("item_given", type.name()));
-        } catch (IllegalArgumentException ex) {
-            player.sendMessage(plugin.getMessage("invalid_gate_type", gateTypeArg));
-        }
-    }
-
     /// Creates configured item stack from configuration section
     /// @param itemSection Configuration section with item data
     /// @param material Item material
     /// @return Configured item stack
-    private ItemStack createConfiguredItem(ConfigurationSection itemSection, Material material) {
+    public ItemStack createConfiguredItem(ConfigurationSection itemSection, Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
@@ -353,20 +382,6 @@ public class LogicGatesCommand implements CommandExecutor {
         sender.spigot().sendMessage(instruction);
     }
 
-    /// Sends color coding information to sender
-    /// @param sender Command sender
-    private void sendColorInformation(CommandSender sender) {
-        sender.sendMessage(plugin.getMessageWithoutPrefix("colors_header"));
-        sendClickableMessage(
-                sender,
-                "Press the button to go to the documentation:\n",
-                "[Go to documentation]",
-                ChatColor.YELLOW,
-                "https://piotrmaciejbednarski.github.io/logicgates-docs/features/gates/",
-                "Click to open documentation"
-        );
-    }
-
     /// Sends how-to instructions to sender
     /// @param sender Command sender
     private void sendHowToInstructions(CommandSender sender) {
@@ -386,10 +401,10 @@ public class LogicGatesCommand implements CommandExecutor {
     /// @param sender Command sender
     private void sendHelpInformation(CommandSender sender) {
         sender.sendMessage(plugin.getMessageWithoutPrefix("help_header"));
-        sendMultipleMessages(sender, "help_colors", "help_howto", "help_rotate",
+        sendMultipleMessages(sender, "help_menu", "help_howto", "help_rotate",
                 "help_inspect", "help_particles", "help_save",
                 "help_fixparticles", "help_language", "help_redstonecompatibility",
-                "help_give", "help_toggleinput", "help_timer");
+                "help_toggleinput", "help_timer");
     }
 
     /// Sends author information to sender
