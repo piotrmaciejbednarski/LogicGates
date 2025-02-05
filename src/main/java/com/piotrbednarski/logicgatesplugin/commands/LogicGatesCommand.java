@@ -392,7 +392,7 @@ public class LogicGatesCommand implements CommandExecutor {
                 "Press the button to go to the documentation:\n",
                 "[Go to documentation]",
                 ChatColor.YELLOW,
-                "https://piotrmaciejbednarski.github.io/logicgates-docs/tutorials/create-first-gate/",
+                "https://logicgates-docs.vercel.app/",
                 "Click to open documentation"
         );
     }
