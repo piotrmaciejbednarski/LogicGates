@@ -122,6 +122,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         // Register WorldEdit Integration
         try {
             WorldEdit.getInstance().getEventBus().register(new WorldEditIntegration(this));
+            getLogger().info("WorldEdit Integration has been registered");
         } catch (Exception e) {
             getLogger().severe("Failed to register WorldEdit integration");
         }
