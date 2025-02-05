@@ -1,6 +1,7 @@
 package com.piotrbednarski.logicgatesplugin;
 
 import com.piotrbednarski.logicgatesplugin.commands.LogicGatesCommand;
+import com.piotrbednarski.logicgatesplugin.integrations.WorldEditIntegration;
 import com.piotrbednarski.logicgatesplugin.listeners.GateListener;
 import com.piotrbednarski.logicgatesplugin.model.GateData;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
@@ -8,6 +9,7 @@ import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.GateUtils;
 import com.piotrbednarski.logicgatesplugin.util.GatesConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
+import com.sk89q.worldedit.WorldEdit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -111,6 +113,13 @@ public class LogicGatesPlugin extends JavaPlugin {
         if (updateChecker.shouldCheckAutomatically()) {
             getLogger().info("Performing automatic update check...");
             updateChecker.checkForUpdates(null);
+        }
+
+        // Register WorldEdit Integration
+        try {
+            WorldEdit.getInstance().getEventBus().register(new WorldEditIntegration(this));
+        } catch (Exception e) {
+            getLogger().severe("Failed to register WorldEdit integration");
         }
     }
 

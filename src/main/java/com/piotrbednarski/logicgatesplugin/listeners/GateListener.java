@@ -48,7 +48,7 @@ public class GateListener implements Listener {
         this.updateChecker = updateChecker;
     }
 
-    private BlockFace getPlayerFacingDirection(Player player) {
+    public static BlockFace getPlayerFacingDirection(Player player) {
         float yaw = player.getLocation().getYaw();
 
         if (yaw < 0) {
@@ -119,7 +119,7 @@ public class GateListener implements Listener {
                     return;
                 }
 
-                // Create a new gate with the default facing direction (NORTH)
+                // Create a new gate
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
                 GateData data = new GateData(getPlayerFacingDirection(player), type);
                 boolean defaultState = GateUtils.calculateOutput(type, false, false, false, data);

@@ -15,11 +15,16 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name = "enginehub-maven"
+        url = "https://maven.enginehub.org/repo/"
+    }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
-    implementation 'com.google.code.gson:gson:2.12.1'
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
+    implementation("com.google.code.gson:gson:2.12.1")
 }
 
 def targetJavaVersion = 17

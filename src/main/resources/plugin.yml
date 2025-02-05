@@ -2,7 +2,7 @@ name: LogicGates
 version: '1.1.5'
 main: com.piotrbednarski.logicgatesplugin.LogicGatesPlugin
 api-version: '1.16'
-softdepend: [ Multiverse-Core ]
+softdepend: [ Multiverse-Core, WorldEdit ]
 authors: [ Piotr Bednarski ]
 description: Forget about giant Redstone logic gates. All logic gates in one block!
 website: https://bednarskiwsieci.pl
