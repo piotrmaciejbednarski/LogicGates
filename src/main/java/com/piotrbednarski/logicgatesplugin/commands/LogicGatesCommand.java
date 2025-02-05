@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,10 +83,7 @@ public class LogicGatesCommand implements CommandExecutor {
     // region Command Handlers
 
     private void handleUpdateCheck(CommandSender sender) {
-        if (!sender.hasPermission("logicgates.update")) {
-            sender.sendMessage(plugin.getMessage("errors.no_permission"));
-            return;
-        }
+        if (!validateAdminPermission(sender)) return;
 
         sender.sendMessage(plugin.getMessage("update_checker.checking"));
         updateChecker.checkForUpdates(sender);
@@ -225,7 +221,7 @@ public class LogicGatesCommand implements CommandExecutor {
         ItemStack wand = new ItemStack(Material.STICK);
         ItemMeta meta = wand.getItemMeta();
         meta.setDisplayName(ChatColor.GREEN + "Rotation Wand");
-        meta.setLore(Arrays.asList(ChatColor.GRAY + "Right-click a logic gate to rotate it."));
+        meta.setLore(List.of(ChatColor.GRAY + "Right-click a logic gate to rotate it."));
         meta.setCustomModelData(1450); // Unique ID
         meta.setUnbreakable(true);
         wand.setItemMeta(meta);

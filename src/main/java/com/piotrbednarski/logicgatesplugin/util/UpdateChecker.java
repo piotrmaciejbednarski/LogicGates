@@ -62,7 +62,7 @@ public class UpdateChecker {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Bukkit.getScheduler().runTask(plugin, () -> {
             try {
                 // Create API URL
                 URL url = new URL(String.format(REPO_URL, GITHUB_USER, REPO_NAME));
