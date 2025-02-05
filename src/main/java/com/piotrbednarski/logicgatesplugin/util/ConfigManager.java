@@ -1,30 +1,22 @@
 package com.piotrbednarski.logicgatesplugin.util;
 
 import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
 
 /// Handles configuration management for logic gates plugin.
 /// Manages saving/loading gates and plugin settings to/from YAML file.
 public class ConfigManager {
 
     // Configuration keys
-    public static final String CONFIG_FILE_NAME = "gates.yml";
-    public static final String CONFIG_GATES = "gates";
+    public static final String CONFIG_FILE_NAME = "config.yml";
     public static final String CONFIG_PARTICLES_ENABLED = "particlesEnabled";
     public static final String CONFIG_REDSTONE_COMPATIBILITY = "redstoneCompatibility";
     public static final String CONFIG_PARTICLES_VIEW_DISTANCE = "particlesViewDistance";
     public static final String CONFIG_LANGUAGE = "language";
-    public static final String CONFIG_COOLDOWN_MS = "cooldownMs";
 
     private final LogicGatesPlugin plugin;
     private File configFile;
@@ -65,24 +57,6 @@ public class ConfigManager {
         plugin.setParticlesEnabled(config.getBoolean(CONFIG_PARTICLES_ENABLED, true));
         plugin.setParticleViewDistance(config.getInt(CONFIG_PARTICLES_VIEW_DISTANCE, 16));
         plugin.setDefaultLang(config.getString(CONFIG_LANGUAGE, "en"));
-        plugin.setCooldownMs(config.getLong(CONFIG_COOLDOWN_MS, 100));
-    }
-
-    /// Saves gate data to configuration
-    /// @param location Gate location in world
-    /// @param gateData Gate configuration data
-    public void saveGate(Location location, GateData gateData) {
-        String gateKey = plugin.convertLocationToString(location);
-        String baseKey = CONFIG_GATES + "." + gateKey;
-
-        // Store gate properties in nested structure
-        config.set(baseKey + ".facing", gateData.getFacing().name());
-        config.set(baseKey + ".type", gateData.getType().name());
-        config.set(baseKey + ".state", gateData.isState());
-        config.set(baseKey + ".interval", gateData.getInterval());
-        config.set(baseKey + ".lastToggleTime", gateData.getLastToggleTime());
-
-        saveToFile();
     }
 
     /// Reloads configuration from disk
@@ -95,41 +69,6 @@ public class ConfigManager {
         loadPluginSettings();
     }
 
-    /// Loads all gates from configuration into memory
-    /// @param gates Map to populate with loaded gate data
-    public void loadGates(Map<Location, GateData> gates) {
-        plugin.setRedstoneCompatibility(config.getBoolean(CONFIG_REDSTONE_COMPATIBILITY, false));
-
-        if (config.contains(CONFIG_GATES)) {
-            // Iterate through all stored gate entries
-            Objects.requireNonNull(config.getConfigurationSection(CONFIG_GATES))
-                    .getKeys(false)
-                    .forEach(key -> {
-                        Location loc = plugin.convertStringToLocation(key);
-
-                        // Validate gate block still exists and is valid
-                        if (loc != null && loc.getBlock().getType() == Material.GLASS) {
-                            String facingStr = config.getString(CONFIG_GATES + "." + key + ".facing");
-                            String typeStr = config.getString(CONFIG_GATES + "." + key + ".type");
-                            boolean state = config.getBoolean(CONFIG_GATES + "." + key + ".state", false);
-                            long interval = config.getLong(CONFIG_GATES + "." + key + ".interval", 1000);
-                            long lastToggleTime = config.getLong(CONFIG_GATES + "." + key + ".lastToggleTime", 0);
-
-                            if (facingStr != null && typeStr != null) {
-                                GateData data = new GateData(
-                                        org.bukkit.block.BlockFace.valueOf(facingStr),
-                                        GateType.valueOf(typeStr)
-                                );
-                                data.setState(state);
-                                data.setInterval(interval);
-                                data.setLastToggleTime(lastToggleTime);
-                                gates.put(loc, data);
-                            }
-                        }
-                    });
-        }
-    }
-
     /// Persists current configuration to disk
     public void saveToFile() {
         try {
@@ -138,11 +77,6 @@ public class ConfigManager {
             diskConfig.set(CONFIG_REDSTONE_COMPATIBILITY, plugin.isRedstoneCompatibility());
             diskConfig.set(CONFIG_PARTICLES_VIEW_DISTANCE, plugin.getParticleViewDistance());
             diskConfig.set(CONFIG_LANGUAGE, plugin.getDefaultLang());
-            diskConfig.set(CONFIG_COOLDOWN_MS, plugin.getCooldownMs());
-
-            if (config.contains(CONFIG_GATES)) {
-                diskConfig.set(CONFIG_GATES, config.get(CONFIG_GATES));
-            }
 
             diskConfig.save(configFile);
         } catch (IOException e) {

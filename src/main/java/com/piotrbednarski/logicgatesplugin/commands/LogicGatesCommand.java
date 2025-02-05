@@ -2,21 +2,28 @@ package com.piotrbednarski.logicgatesplugin.commands;
 
 import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
 import com.piotrbednarski.logicgatesplugin.model.GateType;
+import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
+import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /// Handles execution of the /logicgates command and its subcommands.
@@ -24,12 +31,17 @@ import java.util.stream.Collectors;
 public class LogicGatesCommand implements CommandExecutor {
 
     private final LogicGatesPlugin plugin;
+    private final ConfigManager configManager;
+    private final UpdateChecker updateChecker;
+
     private static final String ADMIN_PERMISSION = "logicgates.admin";
 
     /// Constructs a new LogicGatesCommand with a reference to the main plugin instance
     /// @param plugin The LogicGatesPlugin instance
-    public LogicGatesCommand(LogicGatesPlugin plugin) {
+    public LogicGatesCommand(LogicGatesPlugin plugin, ConfigManager configManager, UpdateChecker updateChecker) {
         this.plugin = plugin;
+        this.configManager = configManager;
+        this.updateChecker = updateChecker;
     }
 
     /// Executes the given command, returning its success
@@ -52,10 +64,11 @@ public class LogicGatesCommand implements CommandExecutor {
         String subCommand = args[0].toLowerCase();
         switch (subCommand) {
             case "debug" -> handleDebugCommand(sender);
-            case "give" -> handleGiveCommand(sender, args);
+            case "menu" -> handleGUI(sender);
+            case "update" -> handleUpdateCheck(sender);
             case "inspect" -> handleInspectCommand(sender);
             case "rotate" -> handleRotateCommand(sender);
-            case "colors" -> sendColorInformation(sender);
+            case "toggleinput" -> handleToggleInputCommand(sender);
             case "howto" -> sendHowToInstructions(sender);
             case "help" -> sendHelpInformation(sender);
             case "author" -> sendAuthorInfo(sender);
@@ -63,7 +76,6 @@ public class LogicGatesCommand implements CommandExecutor {
             case "redstonecompatibility" -> handleRedstoneCompatibility(sender, args);
             case "fixparticles" -> handleFixParticles(sender);
             case "particles" -> handleParticlesToggle(sender, args);
-            case "cooldown" -> handleCooldownSetting(sender, args);
             case "language" -> handleLanguageChange(sender, args);
             case "timer" -> handleTimerCooldownSetting(sender, args);
             case "reload" -> handleReload(sender);
@@ -73,6 +85,13 @@ public class LogicGatesCommand implements CommandExecutor {
     }
 
     // region Command Handlers
+
+    private void handleUpdateCheck(CommandSender sender) {
+        if (!validateAdminPermission(sender)) return;
+
+        sender.sendMessage(plugin.getMessage("update_checker.checking"));
+        updateChecker.checkForUpdates(sender);
+    }
 
     /// Handles debug command to toggle debug mode
     /// @param sender Command sender
@@ -87,10 +106,21 @@ public class LogicGatesCommand implements CommandExecutor {
         sender.sendMessage("LogicGates config reloaded!");
     }
 
-    /// Handles item giving command
+    private void handleToggleInputCommand(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(plugin.getMessage("errors.player_only"));
+            return;
+        }
+
+        if (!validatePermission(player, "logicgates.toggleinput")) return;
+
+        plugin.getInputToggleModePlayers().add(player.getUniqueId());
+        player.sendMessage(plugin.getMessage("toggle_input_mode"));
+    }
+
+    /// Handles gate selection from GUI
     /// @param sender Command sender
-    /// @param args Command arguments
-    private void handleGiveCommand(CommandSender sender, String[] args) {
+    private void handleGUI(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(plugin.getMessage("errors.player_only"));
             return;
@@ -98,17 +128,72 @@ public class LogicGatesCommand implements CommandExecutor {
 
         if (!validatePermission(player, "logicgates.give")) return;
 
-        if (!plugin.getGatesConfig().isConfigurationSection("carpets")) {
+        if (!configManager.getConfig().isConfigurationSection("carpets")) {
             player.sendMessage(plugin.getMessage("command_disabled"));
             return;
         }
 
-        if (args.length < 2) {
-            player.sendMessage(plugin.getMessage("give_usage"));
+        openGateGUI(player);
+    }
+
+    private void openGateGUI(Player player) {
+        ConfigurationSection carpetsSection = configManager.getConfig().getConfigurationSection("carpets");
+        if (carpetsSection == null) {
+            player.sendMessage(plugin.getMessage("command_disabled"));
             return;
         }
 
-        processItemGive(player, args[1]);
+        Set<String> gateKeys = carpetsSection.getKeys(false);
+        if (gateKeys.isEmpty()) {
+            player.sendMessage(plugin.getMessage("no_gates_configured"));
+            return;
+        }
+
+        // Calculate GUI size
+        int size = (int) (Math.ceil(gateKeys.size() / 9.0) * 9);
+        size = Math.max(9, Math.min(54, size));
+
+        Inventory gui = Bukkit.createInventory(
+                null,
+                size,
+                ChatColor.translateAlternateColorCodes('&', plugin.getMessageWithoutPrefix("gui_title"))
+        );
+
+        for (String gateKey : gateKeys) {
+            ConfigurationSection gateSection = carpetsSection.getConfigurationSection(gateKey);
+            if (gateSection == null) continue;
+
+            ConfigurationSection itemSection = gateSection.getConfigurationSection("item");
+            if (itemSection == null) continue;
+
+            Material material = Material.matchMaterial(itemSection.getString("material", ""));
+            if (material == null) continue;
+
+            try {
+                GateType type = GateType.valueOf(gateKey.toUpperCase());
+                ItemStack item = createGUIItem(itemSection, material, type);
+                gui.addItem(item);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Invalid gate type in config: " + gateKey);
+            }
+        }
+
+        player.openInventory(gui);
+    }
+
+    private ItemStack createGUIItem(ConfigurationSection itemSection, Material material, GateType type) {
+        ItemStack item = createConfiguredItem(itemSection, material);
+        ItemMeta meta = item.getItemMeta();
+
+        // Add gate identifier
+        meta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "logic_gate"),
+                PersistentDataType.STRING,
+                type.name()
+        );
+
+        item.setItemMeta(meta);
+        return item;
     }
 
     /// Handles changing timer cooldown setting
@@ -157,7 +242,9 @@ public class LogicGatesCommand implements CommandExecutor {
         player.sendMessage(plugin.getMessage("inspect_mode"));
     }
 
-    /// Handles rotation mode activation
+    //region Rotation mode
+
+    /// Handles rotation mode activation and gives the wand
     /// @param sender Command sender
     private void handleRotateCommand(CommandSender sender) {
         if (!(sender instanceof Player player)) {
@@ -165,11 +252,49 @@ public class LogicGatesCommand implements CommandExecutor {
             return;
         }
 
+        // Check if the player has permission to use the command
         if (!validatePermission(player, "logicgates.rotate")) return;
 
-        plugin.getRotationModePlayers().add(player.getUniqueId());
-        player.sendMessage(plugin.getMessage("rotate_mode"));
+        // Check if the player already has a rotation wand in their inventory
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && isRotationWand(item)) {
+                // If the player already has a rotation wand, send a message to the player
+                // saying that they already have a rotation wand
+                player.sendMessage(plugin.getMessage("rotate_already_has_wand"));
+                return;
+            }
+        }
+
+        // Create a new rotation wand
+        ItemStack wand = createRotationWand();
+
+        // Add the rotation wand to the player's inventory
+        player.getInventory().addItem(wand);
+
+        // Send a message to the player
+        player.sendMessage(plugin.getMessage("rotate_wand_received"));
     }
+
+    private ItemStack createRotationWand() {
+        ItemStack wand = new ItemStack(Material.STICK);
+        ItemMeta meta = wand.getItemMeta();
+        meta.setDisplayName(ChatColor.GREEN + "Rotation Wand");
+        meta.setLore(List.of(ChatColor.GRAY + "Right-click a logic gate to rotate it."));
+        meta.setCustomModelData(1450); // Unique ID
+        meta.setUnbreakable(true);
+        wand.setItemMeta(meta);
+        return wand;
+    }
+
+    public boolean isRotationWand(ItemStack item) {
+        if (item == null || item.getType() != Material.STICK) return false;
+        ItemMeta meta = item.getItemMeta();
+
+        // Find by unique id
+        return meta != null && meta.hasCustomModelData() && meta.getCustomModelData() == 1450;
+    }
+
+    //endregion
 
     /// Handles plugin configuration save
     /// @param sender Command sender
@@ -200,40 +325,11 @@ public class LogicGatesCommand implements CommandExecutor {
         return false;
     }
 
-    /// Creates and gives gate item to player based on configuration
-    /// @param player Target player
-    /// @param gateTypeArg Gate type argument
-    private void processItemGive(Player player, String gateTypeArg) {
-        try {
-            GateType type = GateType.valueOf(gateTypeArg.toUpperCase());
-            ConfigurationSection itemSection = plugin.getGatesConfig()
-                    .getConfigurationSection("carpets." + type.name() + ".item");
-
-            if (itemSection == null) {
-                player.sendMessage(plugin.getMessage("no_config_for_gate", type.name()));
-                return;
-            }
-
-            Material material = Material.matchMaterial(itemSection.getString("material", ""));
-            if (material == null) {
-                player.sendMessage(plugin.getMessage("invalid_material_in_config",
-                        itemSection.getString("material")));
-                return;
-            }
-
-            ItemStack item = createConfiguredItem(itemSection, material);
-            player.getInventory().addItem(item);
-            player.sendMessage(plugin.getMessage("item_given", type.name()));
-        } catch (IllegalArgumentException ex) {
-            player.sendMessage(plugin.getMessage("invalid_gate_type", gateTypeArg));
-        }
-    }
-
     /// Creates configured item stack from configuration section
     /// @param itemSection Configuration section with item data
     /// @param material Item material
     /// @return Configured item stack
-    private ItemStack createConfiguredItem(ConfigurationSection itemSection, Material material) {
+    public ItemStack createConfiguredItem(ConfigurationSection itemSection, Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
@@ -286,31 +382,17 @@ public class LogicGatesCommand implements CommandExecutor {
         sender.spigot().sendMessage(instruction);
     }
 
-    /// Sends color coding information to sender
-    /// @param sender Command sender
-    private void sendColorInformation(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("colors_header"));
-        sendClickableMessage(
-                sender,
-                "Press the button to go to the documentation:\n",
-                "[Go to documentation]",
-                ChatColor.YELLOW,
-                "https://piotrmaciejbednarski.github.io/logicgates-docs/features/gates/",
-                "Click to open documentation"
-        );
-    }
-
     /// Sends how-to instructions to sender
     /// @param sender Command sender
     private void sendHowToInstructions(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("howto_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("howto_header"));
 
         sendClickableMessage(
                 sender,
                 "Press the button to go to the documentation:\n",
                 "[Go to documentation]",
                 ChatColor.YELLOW,
-                "https://piotrmaciejbednarski.github.io/logicgates-docs/tutorials/create-first-gate/",
+                "https://logicgates-docs.vercel.app/",
                 "Click to open documentation"
         );
     }
@@ -318,17 +400,17 @@ public class LogicGatesCommand implements CommandExecutor {
     /// Sends help information to sender
     /// @param sender Command sender
     private void sendHelpInformation(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("help_header"));
-        sendMultipleMessages(sender, "help_colors", "help_howto", "help_rotate",
-                "help_inspect", "help_cooldown", "help_particles", "help_save",
+        sender.sendMessage(plugin.getMessageWithoutPrefix("help_header"));
+        sendMultipleMessages(sender, "help_menu", "help_howto", "help_rotate",
+                "help_inspect", "help_particles", "help_save",
                 "help_fixparticles", "help_language", "help_redstonecompatibility",
-                "help_give", "help_timer");
+                "help_toggleinput", "help_timer");
     }
 
     /// Sends author information to sender
     /// @param sender Command sender
     private void sendAuthorInfo(CommandSender sender) {
-        sender.sendMessage(plugin.getMessage("author_header"));
+        sender.sendMessage(plugin.getMessageWithoutPrefix("author_header"));
         sendMultipleMessages(sender, "author_name", "author_contact");
     }
 
@@ -405,29 +487,6 @@ public class LogicGatesCommand implements CommandExecutor {
         plugin.saveGates();
     }
 
-    /// Handles cooldown setting
-    /// @param sender Command sender
-    /// @param args Command arguments
-    private void handleCooldownSetting(CommandSender sender, String[] args) {
-        if (!validateAdminPermission(sender)) return;
-
-        if (args.length < 2) {
-            sender.sendMessage(plugin.getMessage("cooldown_usage"));
-            return;
-        }
-
-        try {
-            long newCooldown = Long.parseLong(args[1]);
-            if (newCooldown < 0) throw new NumberFormatException();
-
-            plugin.setCooldownMs(newCooldown);
-            sender.sendMessage(plugin.getMessage("cooldown_set", newCooldown));
-            plugin.saveGates();
-        } catch (NumberFormatException e) {
-            sender.sendMessage(plugin.getMessage("errors.cooldown_invalid"));
-        }
-    }
-
     /// Handles language change
     /// @param sender Command sender
     /// @param args Command arguments
@@ -440,7 +499,7 @@ public class LogicGatesCommand implements CommandExecutor {
         }
 
         String languageCode = args[1].toLowerCase();
-        if (languageCode.equals("en") || languageCode.equals("pl")) {
+        if (plugin.getMessages().get("messages." + languageCode) != null) {
             plugin.setDefaultLang(languageCode);
             plugin.saveGates();
             sender.sendMessage(plugin.getMessage("language_changed"));

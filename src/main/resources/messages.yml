@@ -1,53 +1,62 @@
 messages:
   en:
-    prefix: "&6&l[LogicGates] &r"
+    prefix: "&8[&6LogicGates&8] &r"
     errors:
       no_permission: "&cYou don't have permission!"
       invalid_subcommand: "&cUnknown command. Use /logicgates help"
       cooldown_invalid: "&cInvalid cooldown!"
       player_only: "&cPlayer-only command!"
-      command_usage: "&cUsage: /logicgates [help|inspect|rotate|save|fixparticles|particles|cooldown]"
+      command_usage: "&cUsage: /logicgates [help|menu|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]"
       not_timer_gate: "&cThis is not a timer gate!"
+      not_a_gate: "&cThis block is not a valid logic gate!"
+    update_checker:
+      checking: "&6Checking for updates..."
+      available: "&eAn update is available! New version: &6%latest% &e(current: &c%current%&e)"
+      disabled: "&cUpdate checker is disabled in config"
+      failed: "&cFailed to check for updates"
+      up_to_date: "&aYou're running the latest version!"
+      notify_join: "&eYour plugin is outdated! Latest: &6%latest%\n&eDownload: &n%url%"
+      success: "&aUpdate check completed successfully"
+
+    gui_title: "&0Choose gate type"
     gate_created: "&aCreated %s gate!"
     gate_removed: "&aGate successfully removed!"
-    rotate_mode: "&6Click gate to rotate!"
+    rotate_wand_received: "&6You have received the Rotation Wand!\n&lRight-click a gate to rotate it"
+    rotate_already_has_wand: "&cYou already have the Rotation Wand in your inventory!"
+    gate_rotated: "&aGate rotated! New facing: %s"
     inspect_mode: "&dClick gate to inspect!"
 
     timer_usage: "&cUsage: /logicgates timer <time_in_seconds>"
     timer_cooldown_mode_enter: "&aClick the timer gate to set the cooldown to %s seconds!"
     timer_cooldown_set_success: "&aThe timer cooldown has been set to %s seconds!"
 
-    redstonecompatibility_usage: "Usage: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "Redstone compatibility has been enabled."
-    redstonecompatibility_disabled: "Redstone compatibility has been disabled."
-    redstonecompatibility_invalid_state: "Invalid state. Use 'on' or 'off'."
+    toggle_input_mode: "&6Click the gate to change the number of inputs (2/3)"
+    gate_input_toggled: "&6The &e%s &6gate has been changed to %s-input"
+
+    redstonecompatibility_usage: "&cUsage: /logicgates redstonecompatibility <on|off>"
+    redstonecompatibility_enabled: "&aRedstone compatibility has been enabled"
+    redstonecompatibility_disabled: "&cRedstone compatibility has been disabled"
+    redstonecompatibility_invalid_state: "&cInvalid state. Use 'on' or 'off'."
 
     command_disabled: "&cThis command is disabled because carpet items are not configured."
-    no_config_for_gate: "&cNo configuration found for gate type %s."
-    invalid_material_in_config: "&cInvalid material '%s' in configuration."
     item_given: "&aYou have been given the item for gate %s."
-    invalid_gate_type: "&cInvalid gate type: %s."
-    give_usage: "&cUsage: /logicgates give <gateType>"
 
-    colors_header: "&6==== Logic Gates - Colors ===="
-
-    howto_header: "&6==== Logic Gates - How to? ===="
-
-    help_header: "&6==== Logic Gates Help ===="
-    help_colors: "&e/logicgates colors - Logic gates list and carpet colors"
+    colors_header: "&8==== &6Logic Gates - Colors &8===="
+    howto_header: "&8==== &6Logic Gates - How to? &8===="
+    help_header: "&8==== &6Logic Gates Help &8===="
     help_howto: "&e/logicgates howto - Quick guide to getting started"
     help_rotate: "&e/logicgates rotate - Click a gate to rotate"
     help_inspect: "&e/logicgates inspect - Click a gate to inspect"
-    help_cooldown: "&e/logicgates cooldown [ms] - Set operation cooldown"
     help_particles: "&e/logicgates particles [on|off] - Toggle particles globally"
     help_save: "&e/logicgates save - Save all logic gates manually"
     help_fixparticles: "&e/logicgates fixparticles - Reset particles if not shown"
     help_language: "&e/logicgates language [en,pl,de,es] - Change plugin language"
     help_redstonecompatibility: "&e/logicgates redstonecompatibility [on|off] (Default: off) - Enable or disable redstone compatibility"
-    help_give: "&e/logicgates give [gate_type] - Give special carpet to build logic gate"
+    help_menu: "&e/logicgates menu - Open the logic gate selection menu"
+    help_toggleinput: "&e/logicgates toggleinput - Toggle the selected gateway to 2 or 3-input"
     help_timer: "&e/logicgates timer [time_in_seconds] - Change timer gate cooldown (Default: 1 second)"
 
-    author_header: "&6==== Logic Gates ===="
+    author_header: "&8==== &6Logic Gates &8===="
     author_name: "&eAuthor: Piotr Bednarski"
     author_contact: "&eContact: piotr.maciej.bednarski@gmail.com"
 
@@ -56,11 +65,8 @@ messages:
     particles_reloaded: "&aParticles reloaded!"
     particles_usage: "&cUsage: /logicgates particles [on|off]"
     particles_enabled: "&aParticles enabled!"
-    particles_disabled: "&aParticles disabled!"
+    particles_disabled: "&cParticles disabled!"
     particles_invalid_state: "&cInvalid state. Use 'on' or 'off'."
-
-    cooldown_usage: "&cUsage: /logicgates cooldown [milliseconds] (Default: 100)"
-    cooldown_set: "&aCooldown set to %s ms."
 
     language_usage: "&cUsage: /logicgates language [language_code] (en, pl, de, es)"
     language_changed: "&aPlugin language changed."
@@ -68,7 +74,7 @@ messages:
 
     unknown_command: "&cUnknown subcommand. Use /logicgates help for help."
 
-    inspect_header: "&6=== Logic Gate inspection ==="
+    inspect_header: "&8=== &6Logic Gate inspection &8==="
     inspect_type: "Type: &e%s"
     inspect_facing: "Facing: &b%s"
     inspect_output: "Output: %s"
@@ -76,245 +82,4 @@ messages:
     redstone_active: "&aActive"
     redstone_inactive: "&cNot active"
 
-    gate_rotated: "&aGate rotated! New facing: %s"
     invalid_output_material: "&cInvalid material detected at the gate output! Using redstone, repeater, or redstone torch may not work or cause malfunctions. Use a button, lever, or observer instead."
-  pl:
-    prefix: "&6&l[LogicGates] &r"
-    errors:
-      no_permission: "&cBrak uprawnień!"
-      invalid_subcommand: "&cNieznana komenda. Użyj /logicgates help"
-      cooldown_invalid: "&cNieprawidłowy cooldown!"
-      player_only: "&cTylko dla graczy!"
-      command_usage: "&cUżyj: /logicgates [help|inspect|rotate|save|fixparticles|particles|cooldown]"
-      not_timer_gate: "&cTo nie jest bramka typu TIMER!"
-    gate_created: "&aUtworzono bramkę %s!"
-    gate_removed: "&aBramka została usunięta!"
-    rotate_mode: "&6Kliknij bramkę do obrotu!"
-    inspect_mode: "&dKliknij bramkę do inspekcji!"
-
-    redstonecompatibility_usage: "Użycie: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "Kompatybilność z Redstone została włączona."
-    redstonecompatibility_disabled: "Kompatybilność z Redstone została wyłączona."
-    redstonecompatibility_invalid_state: "Nieprawidłowy stan. Użyj 'on' lub 'off'."
-
-    timer_usage: "&cUżycie: /logicgates timer <czas_w_sekundach>"
-    timer_cooldown_mode_enter: "&aKliknij timer gate aby ustawić cooldown na %s sekund!"
-    timer_cooldown_set_success: "&aCooldown timera został ustawiony na %s sekund!"
-
-    command_disabled: "&cTa komenda jest wyłączona, ponieważ przedmioty dywanów nie są skonfigurowane."
-    no_config_for_gate: "&cNie znaleziono konfiguracji dla bramki typu %s."
-    invalid_material_in_config: "&cNieprawidłowy materiał '%s' w konfiguracji."
-    item_given: "&aOtrzymałeś przedmiot dla bramki %s."
-    invalid_gate_type: "&cNieprawidłowy typ bramki: %s."
-    give_usage: "&cUżycie: /logicgates give <gateType>"
-
-    colors_header: "&6==== Logic Gates - Colors ===="
-
-    howto_header: "&6==== Logic Gates - Jak zacząć? ===="
-
-    help_header: "&6==== Pomoc - Logic Gates ===="
-    help_colors: "&e/logicgates colors - Lista bramek i kolorów dywanów"
-    help_howto: "&e/logicgates howto - Szybki przewodnik startowy"
-    help_rotate: "&e/logicgates rotate - Kliknij bramkę, aby ją obrócić"
-    help_inspect: "&e/logicgates inspect - Kliknij bramkę, aby ją zbadać"
-    help_cooldown: "&e/logicgates cooldown [ms] - Ustaw globalny czas propagacji bramek"
-    help_particles: "&e/logicgates particles [on|off] - Włącz/Wyłącz cząsteczki globalnie"
-    help_save: "&e/logicgates save - Ręcznie zapisz wszystkie bramki"
-    help_fixparticles: "&e/logicgates fixparticles - Zresetuj cząsteczki, jeśli nie są widoczne"
-    help_language: "&e/logicgates language [en,pl,de,es] - Zmień język pluginu"
-    help_redstonecompatibility: "&e/logicgates redstonecompatibility [on|off] (Default: off) - Enable or disable redstone compatibility"
-    help_give: "&e/logicgates give [gate_type] - Give special carpet to build logic gate"
-    help_timer: "&e/logicgates timer [time_in_seconds] - Change timer gate cooldown (Default: 1 second)"
-
-    author_header: "&6==== Logic Gates ===="
-    author_name: "&eAutor: Piotr Bednarski"
-    author_contact: "&eKontakt: piotr.maciej.bednarski@gmail.com"
-
-    save_success: "&aBramki zapisane pomyślnie!"
-
-    particles_reloaded: "&aCząsteczki przeładowane!"
-    particles_usage: "&cUżycie: /logicgates particles [on|off]"
-    particles_enabled: "&aCząsteczki włączone!"
-    particles_disabled: "&aCząsteczki wyłączone!"
-    particles_invalid_state: "&cNieprawidłowy stan. Użyj 'on' lub 'off'."
-
-    cooldown_usage: "&cUżycie: /logicgates cooldown [milisekundy] (Domyślnie: 100)"
-    cooldown_set: "&aCooldown ustawiony na %s ms."
-
-    language_usage: "&cUżycie: /logicgates language [kod_języka] (en, pl, de, es)"
-    language_changed: "&aJęzyk pluginu zmieniony."
-    language_invalid: "&cNieprawidłowy kod języka!"
-
-    unknown_command: "&cNieznana komenda. Użyj /logicgates help, aby uzyskać pomoc."
-
-    inspect_header: "&6=== Inspektor bramek ==="
-    inspect_type: "Typ: &e%s"
-    inspect_facing: "Kierunek: &b%s"
-    inspect_output: "Wyjście: %s"
-
-    redstone_active: "&aAktywne"
-    redstone_inactive: "&cNieaktywne"
-
-    gate_rotated: "&aBramka obrócona! Nowy kierunek: %s"
-
-    invalid_output_material: "&cWykryto nieprawidłowy materiał na wyjściu bramki! Użycie redstone, repeatera lub pochodni redstone może nie działać lub prowadzić do nieprawidłowego działania. Użyj guzika, dźwigni lub obserwatora."
-  de:
-    prefix: "&6&l[LogicGates] &r"
-    errors:
-      no_permission: "&cDu hast keine Berechtigung!"
-      invalid_subcommand: "&cUnbekannter Befehl. Verwende /logicgates help"
-      cooldown_invalid: "&cUngültige Abklingzeit!"
-      player_only: "&cNur für Spieler!"
-      command_usage: "&cVerwendung: /logicgates [help|inspect|rotate|save|fixparticles|particles|cooldown]"
-      not_timer_gate: "&cDas ist kein Timer-Gate!"
-    gate_created: "&a%s-Gatter erstellt!"
-    gate_removed: "&aLogikgatter erfolgreich entfernt!"
-    rotate_mode: "&6Klicke auf ein Gatter, um es zu drehen!"
-    inspect_mode: "&dKlicke auf ein Gatter, um es zu inspizieren!"
-
-    redstonecompatibility_usage: "Verwendung: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "Redstone-Kompatibilität wurde aktiviert."
-    redstonecompatibility_disabled: "Redstone-Kompatibilität wurde deaktiviert."
-    redstonecompatibility_invalid_state: "Ungültiger Zustand. Verwende 'on' oder 'off'."
-
-    timer_usage: "&cVerwendung: /logicgates timer <zeit_in_sekunden>"
-    timer_cooldown_mode_enter: "&aKlicke auf das Timer-Gate, um die Abklingzeit auf %s Sekunden zu setzen!"
-    timer_cooldown_set_success: "&aDie Abklingzeit des Timers wurde auf %s Sekunden gesetzt!"
-
-    command_disabled: "&cDieser Befehl ist deaktiviert, da Teppich-Items nicht konfiguriert sind."
-    no_config_for_gate: "&cKeine Konfiguration für Tor-Typ %s gefunden."
-    invalid_material_in_config: "&cUngültiges Material '%s' in der Konfiguration."
-    item_given: "&aDu hast das Item für das Tor %s erhalten."
-    invalid_gate_type: "&cUngültiger Tor-Typ: %s."
-    give_usage: "&Verwendung: /logicgates give <gateType>"
-
-    colors_header: "&6==== Logic Gates - Colors ===="
-
-    howto_header: "&6==== Logic Gates - How to? ===="
-
-    help_header: "&6==== Logic Gates Hilfe ===="
-    help_colors: "&e/logicgates colors - Liste der Gatter und Teppichfarben"
-    help_howto: "&e/logicgates howto - Schnellstartanleitung"
-    help_rotate: "&e/logicgates rotate - Klicke auf ein Gatter, um es zu drehen"
-    help_inspect: "&e/logicgates inspect - Klicke auf ein Gatter, um es zu inspizieren"
-    help_cooldown: "&e/logicgates cooldown [ms] - Setze die Abklingzeit"
-    help_particles: "&e/logicgates particles [on|off] - Partikel global ein-/ausschalten"
-    help_save: "&e/logicgates save - Speichere alle Gatter manuell"
-    help_fixparticles: "&e/logicgates fixparticles - Setze Partikel zurück, falls nicht angezeigt"
-    help_language: "&e/logicgates language [en,pl,de,es] - Ändere die Plugin-Sprache"
-    help_redstonecompatibility: "&e/logicgates redstonecompatibility [on|off] (Default: off) - Enable or disable redstone compatibility"
-    help_give: "&e/logicgates give [gate_type] - Give special carpet to build logic gate"
-    help_timer: "&e/logicgates timer [time_in_seconds] - Change timer gate cooldown (Default: 1 second)"
-
-    author_header: "&6==== Logic Gates ===="
-    author_name: "&eAutor: Piotr Bednarski"
-    author_contact: "&eKontakt: piotr.maciej.bednarski@gmail.com"
-
-    save_success: "&aGatter erfolgreich gespeichert!"
-
-    particles_reloaded: "&aPartikel neu geladen!"
-    particles_usage: "&cVerwendung: /logicgates particles [on|off]"
-    particles_enabled: "&aPartikel aktiviert!"
-    particles_disabled: "&aPartikel deaktiviert!"
-    particles_invalid_state: "&cUngültiger Zustand. Verwende 'on' oder 'off'."
-
-    cooldown_usage: "&cVerwendung: /logicgates cooldown [Millisekunden] (Standard: 100)"
-    cooldown_set: "&aAbklingzeit auf %s ms gesetzt."
-
-    language_usage: "&cVerwendung: /logicgates language [Sprachcode] (en, pl, de, es)"
-    language_changed: "&aPlugin-Sprache geändert."
-    language_invalid: "&cUngültiger Sprachcode!"
-
-    unknown_command: "&cUnbekannter Befehl. Verwende /logicgates help für Hilfe."
-
-    inspect_header: "&6=== Gatter-Inspektion ==="
-    inspect_type: "Typ: &e%s"
-    inspect_facing: "Ausrichtung: &b%s"
-    inspect_output: "Ausgang: %s"
-
-    redstone_active: "&aAktiv"
-    redstone_inactive: "&cInaktiv"
-
-    gate_rotated: "&aGatter gedreht! Neue Ausrichtung: %s"
-
-    invalid_output_material: "&cUngültiges Material am Torausgang erkannt! Die Verwendung von Redstone, Repeater oder Redstone-Fackel funktioniert möglicherweise nicht oder führt zu Fehlfunktionen. Verwende stattdessen einen Knopf, einen Hebel oder einen Observer."
-  es:
-    prefix: "&6&l[LogicGates] &r"
-    errors:
-      no_permission: "&c¡No tienes permiso!"
-      invalid_subcommand: "&cComando desconocido. Usa /logicgates help"
-      cooldown_invalid: "&c¡Tiempo de espera inválido!"
-      player_only: "&c¡Solo para jugadores!"
-      command_usage: "&cUso: /logicgates [help|inspect|rotate|save|fixparticles|particles|cooldown]"
-      not_timer_gate: "&c¡Esto no es un timer gate!"
-    gate_created: "&a¡Puerta %s creada!"
-    gate_removed: "&a¡Compuerta eliminada correctamente!"
-    rotate_mode: "&6¡Haz clic en una puerta para rotarla!"
-    inspect_mode: "&d¡Haz clic en una puerta para inspeccionarla!"
-
-    redstonecompatibility_usage: "Uso: /logicgates redstonecompatibility <on|off>"
-    redstonecompatibility_enabled: "La compatibilidad con Redstone ha sido activada."
-    redstonecompatibility_disabled: "La compatibilidad con Redstone ha sido desactivada."
-    redstonecompatibility_invalid_state: "Estado inválido. Usa 'on' o 'off'."
-
-    timer_usage: "&cUso: /logicgates timer <tiempo_en_segundos>"
-    timer_cooldown_mode_enter: "&aHaz clic en el timer gate para establecer el cooldown en %s segundos!"
-    timer_cooldown_set_success: "&aEl cooldown del temporizador se ha establecido en %s segundos!"
-
-    command_disabled: "&cEste comando está deshabilitado porque los ítems de alfombras no están configurados."
-    no_config_for_gate: "&cNo se encontró configuración para el tipo de compuerta %s."
-    invalid_material_in_config: "&cMaterial inválido '%s' en la configuración."
-    item_given: "&aSe te ha entregado el ítem para la compuerta %s."
-    invalid_gate_type: "&cTipo de compuerta inválido: %s."
-    give_usage: "&Uso: /logicgates give <gateType>"
-
-    colors_header: "&6==== Logic Gates - Colors ===="
-
-    howto_header: "&6==== Logic Gates - How to? ===="
-
-    help_header: "&6==== Ayuda de Logic Gates ===="
-    help_colors: "&e/logicgates colors - Lista de puertas y colores de alfombras"
-    help_howto: "&e/logicgates howto - Guía rápida para comenzar"
-    help_rotate: "&e/logicgates rotate - Haz clic en una puerta para rotarla"
-    help_inspect: "&e/logicgates inspect - Haz clic en una puerta para inspeccionarla"
-    help_cooldown: "&e/logicgates cooldown [ms] - Establece el tiempo de espera"
-    help_particles: "&e/logicgates particles [on|off] - Activa/desactiva partículas globalmente"
-    help_save: "&e/logicgates save - Guarda todas las puertas manualmente"
-    help_fixparticles: "&e/logicgates fixparticles - Reinicia las partículas si no se muestran"
-    help_language: "&e/logicgates language [en,pl,de,es] - Cambia el idioma del plugin"
-    help_redstonecompatibility: "&e/logicgates redstonecompatibility [on|off] (Default: off) - Enable or disable redstone compatibility"
-    help_give: "&e/logicgates give [gate_type] - Give special carpet to build logic gate"
-    help_timer: "&e/logicgates timer [time_in_seconds] - Change timer gate cooldown (Default: 1 second)"
-
-    author_header: "&6==== Logic Gates ===="
-    author_name: "&eAutor: Piotr Bednarski"
-    author_contact: "&eContacto: piotr.maciej.bednarski@gmail.com"
-
-    save_success: "&a¡Puertas guardadas correctamente!"
-
-    particles_reloaded: "&a¡Partículas recargadas!"
-    particles_usage: "&cUso: /logicgates particles [on|off]"
-    particles_enabled: "&a¡Partículas activadas!"
-    particles_disabled: "&a¡Partículas desactivadas!"
-    particles_invalid_state: "&cEstado inválido. Usa 'on' u 'off'."
-
-    cooldown_usage: "&cUso: /logicgates cooldown [milisegundos] (Por defecto: 100)"
-    cooldown_set: "&aTiempo de espera establecido en %s ms."
-
-    language_usage: "&cUso: /logicgates language [código_idioma] (en, pl, de, es)"
-    language_changed: "&aIdioma del plugin cambiado."
-    language_invalid: "&c¡Código de idioma inválido!"
-
-    unknown_command: "&cComando desconocido. Usa /logicgates help para ayuda."
-
-    inspect_header: "&6=== Inspección de Puerta ==="
-    inspect_type: "Tipo: &e%s"
-    inspect_facing: "Orientación: &b%s"
-    inspect_output: "Salida: %s"
-
-    redstone_active: "&aActivo"
-    redstone_inactive: "&cInactivo"
-
-    gate_rotated: "&a¡Puerta rotada! Nueva orientación: %s"
-
-    invalid_output_material: "&c¡Material no válido detectado en la salida de la puerta! Usar redstone, repetidor o antorcha de redstone puede no funcionar o causar mal funcionamiento. Usa un botón, palanca u observador."

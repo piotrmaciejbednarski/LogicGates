@@ -6,6 +6,7 @@ public class GateData {
     private BlockFace facing;
     private final GateType type;
     private boolean state;
+    private boolean isThreeInput = false;
     private long lastToggleTime;
     private long interval = 1000L;
 
@@ -27,9 +28,7 @@ public class GateData {
         return type;
     }
 
-    public boolean isState() {
-        return state;
-    }
+    public boolean getState() { return state; }
 
     public void setState(boolean state) {
         this.state = state;
@@ -49,5 +48,13 @@ public class GateData {
 
     public long getInterval() {
         return interval;
+    }
+
+    public boolean isThreeInput() {
+        return isThreeInput;
+    }
+
+    public void setThreeInput(boolean threeInput) {
+        isThreeInput = threeInput;
     }
 }

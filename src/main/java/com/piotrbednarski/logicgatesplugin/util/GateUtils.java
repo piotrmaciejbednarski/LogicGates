@@ -89,37 +89,44 @@ public final class GateUtils {
     /// @param input1 First input state
     /// @param input2 Second input state (ignored for single-input gates)
     /// @return Resulting output state
-    public static boolean calculateOutput(GateType type, boolean input1, boolean input2, GateData data) {
+    public static boolean calculateOutput(GateType type, boolean input1, boolean input2, boolean input3, GateData data) {
+        boolean isThreeInput = data.isThreeInput();
         return switch (type) {
-            case XNOR -> input1 == input2;
-            case IMPLICATION -> !input1 || input2;
-            case XOR -> input1 != input2;
-            case AND -> input1 && input2;
-            case OR -> input1 || input2;
-            case NOT -> !input1;                   // Single-input gate
-            case NAND -> !(input1 && input2);
-            case NOR -> !(input1 || input2);
+            case XNOR -> isThreeInput ? (input1 == input2 && input2 == input3) : (input1 == input2);
+            case IMPLICATION -> isThreeInput ? (!input1 || !input2 || input3) : (!input1 || input2);
+            case XOR -> {
+                if (isThreeInput) {
+                    int count = (input1 ? 1 : 0) + (input2 ? 1 : 0) + (input3 ? 1 : 0);
+                    yield count % 2 == 1;
+                } else {
+                    yield input1 != input2;
+                }
+            }
+            case AND -> isThreeInput ? (input1 && input2 && input3) : (input1 && input2);
+            case OR -> isThreeInput ? (input1 || input2 || input3) : (input1 || input2);
+            case NOT -> !input1;
+            case NAND -> isThreeInput ? !(input1 && input2 && input3) : !(input1 && input2);
+            case NOR -> isThreeInput ? !(input1 || input2 || input3) : !(input1 || input2);
             case TIMER -> {
                 long currentTime = System.currentTimeMillis();
                 long interval = data.getInterval();
                 if (currentTime - data.getLastToggleTime() >= interval) {
-                    data.setState(!data.isState());
+                    data.setState(!data.getState());
                     data.setLastToggleTime(currentTime);
                 }
-                yield data.isState();
+                yield data.getState();
             }
             case RS_LATCH -> {
                 if (input1 && input2) {
-                    // Invalid state: maintain current state
-                    yield data.isState();
+                    yield data.getState();
                 } else if (input1) {
                     data.setState(true);
                 } else if (input2) {
                     data.setState(false);
                 }
-                yield data.isState();
+                yield data.getState();
             }
-            default -> false;                      // Unknown gate type
+            default -> false;
         };
     }
 
@@ -181,6 +188,7 @@ public final class GateUtils {
                     }
                 }
             }
+            block.getState().update(true, true);
         } catch (Exception e) {
             Bukkit.getLogger().warning("Failed to set redstone power for block: " + block.getType());
         }
@@ -213,6 +221,8 @@ public final class GateUtils {
                 rotateCounterClockwise(facing, ROTATION_ORDER).getDirection().multiply(offsetDistance));
         Location secondInputLocation = center.clone().add(
                 rotateClockwise(facing, ROTATION_ORDER).getDirection().multiply(offsetDistance));
+        Location thirdInputLocation = center.clone().add(
+                facing.getOppositeFace().getDirection().multiply(offsetDistance));
         Location outputLocation = center.clone().add(
                 facing.getDirection().multiply(offsetDistance));
 
@@ -240,7 +250,13 @@ public final class GateUtils {
                     outputLocation,
                     5, new Particle.DustOptions(Color.GREEN, 1));
         } else {
-            // Dual inputs for other gates
+            // Inputs for other gates: minimum 2 inputs
+            GateData data = plugin.getGates().get(gateBlock.getLocation());
+            if (data.isThreeInput()) {
+                world.spawnParticle(Particle.REDSTONE,
+                        thirdInputLocation,
+                        5, new Particle.DustOptions(Color.AQUA, 1));
+            }
             world.spawnParticle(Particle.REDSTONE,
                     inputLocation,
                     5, new Particle.DustOptions(Color.RED, 1));
