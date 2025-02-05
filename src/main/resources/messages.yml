@@ -68,9 +68,6 @@ messages:
     particles_disabled: "&cParticles disabled!"
     particles_invalid_state: "&cInvalid state. Use 'on' or 'off'."
 
-    cooldown_usage: "&cUsage: /logicgates cooldown [milliseconds] (Default: 100)"
-    cooldown_set: "&aCooldown set to %s ms."
-
     language_usage: "&cUsage: /logicgates language [language_code] (en, pl, de, es)"
     language_changed: "&aPlugin language changed."
     language_invalid: "&cInvalid language_code value!"
