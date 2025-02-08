@@ -1,9 +1,9 @@
-package com.piotrbednarski.logicgatesplugin.util;
+package pl.bednarskiwsieci.logicgatesplugin.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 

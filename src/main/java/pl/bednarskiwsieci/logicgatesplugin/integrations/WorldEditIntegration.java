@@ -1,10 +1,10 @@
-package com.piotrbednarski.logicgatesplugin.integrations;
+package pl.bednarskiwsieci.logicgatesplugin.integrations;
 
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.listeners.GateListener;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
-import com.piotrbednarski.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;

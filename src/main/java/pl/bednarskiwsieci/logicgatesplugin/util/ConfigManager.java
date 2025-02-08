@@ -1,6 +1,6 @@
-package com.piotrbednarski.logicgatesplugin.util;
+package pl.bednarskiwsieci.logicgatesplugin.util;
 
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

@@ -1,16 +1,16 @@
 plugins {
     id 'java'
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "9.0.0-beta8"
 }
 
-group = 'com.piotrbednarski'
-version = '1.1.6'
+group = 'pl.bednarskiwsieci'
+version = '1.1.7'
 
 repositories {
     mavenCentral()
     maven {
-        name = "spigotmc-repo"
-        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
     maven {
         name = "sonatype"
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
     compileOnly("com.google.code.gson:gson:2.12.1")
     implementation("org.bstats:bstats-bukkit:3.0.0")
@@ -32,7 +32,7 @@ dependencies {
 tasks {
     shadowJar {
         minimize()
-        relocate("org.bstats", "com.piotrbednarski.bstats")
+        relocate("org.bstats", "pl.bednarskiwsieci.bstats")
         archiveClassifier.set("")
     }
 

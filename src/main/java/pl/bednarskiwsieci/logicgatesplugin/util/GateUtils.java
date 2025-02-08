@@ -1,8 +1,8 @@
-package com.piotrbednarski.logicgatesplugin.util;
+package pl.bednarskiwsieci.logicgatesplugin.util;
 
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -17,7 +17,7 @@ import org.bukkit.block.data.type.Repeater;
 
 import java.util.Arrays;
 
-import static com.piotrbednarski.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
+import static pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
 
 /// Utility class for handling logic gate operations and Minecraft block interactions.
 /// Provides methods for location conversion, block rotation, logic calculations, and visual effects.

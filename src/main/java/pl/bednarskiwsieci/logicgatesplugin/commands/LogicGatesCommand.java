@@ -1,9 +1,9 @@
-package com.piotrbednarski.logicgatesplugin.commands;
+package pl.bednarskiwsieci.logicgatesplugin.commands;
 
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
-import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
-import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
