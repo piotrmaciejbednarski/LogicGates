@@ -10,6 +10,7 @@ import com.piotrbednarski.logicgatesplugin.util.GateUtils;
 import com.piotrbednarski.logicgatesplugin.util.GatesConfigManager;
 import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
 import com.sk89q.worldedit.WorldEdit;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -108,6 +109,10 @@ public class LogicGatesPlugin extends JavaPlugin {
                         getDescription().getAPIVersion()
                 )
         );
+
+        // Initialize bStats
+        int BSTATS_ID = 24700;
+        Metrics metrics = new Metrics(this, BSTATS_ID);
 
         // Automatic update check on startup
         try {
