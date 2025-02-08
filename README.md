@@ -5,7 +5,7 @@
 
 A feature-rich implementation of logic gates fully compatible with Minecraft Redstone systems. Create complex circuits with ease using intuitive gates and seamless Redstone integration. Perfect for technical servers and redstone engineers.
 
-🔗 **Check documentation**: [https://logicgates-docs.vercel.app/](https://logicgates-docs.vercel.app/)
+🔗 **Check documentation**: [https://logicgates.bednarskiwsieci.pl](https://logicgates.bednarskiwsieci.pl/)
 
 ## Installation
 
