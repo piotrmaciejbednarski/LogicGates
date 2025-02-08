@@ -1,14 +1,14 @@
-package com.piotrbednarski.logicgatesplugin;
+package pl.bednarskiwsieci.logicgatesplugin;
 
-import com.piotrbednarski.logicgatesplugin.commands.LogicGatesCommand;
-import com.piotrbednarski.logicgatesplugin.integrations.WorldEditIntegration;
-import com.piotrbednarski.logicgatesplugin.listeners.GateListener;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
-import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
-import com.piotrbednarski.logicgatesplugin.util.GateUtils;
-import com.piotrbednarski.logicgatesplugin.util.GatesConfigManager;
-import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
+import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
+import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
+import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.util.GatesConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import com.sk89q.worldedit.WorldEdit;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.piotrbednarski.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
+import static pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
 
 /// Main plugin class for Logic Gates implementation in Minecraft.
 /// Handles gate management, configuration, and event processing.

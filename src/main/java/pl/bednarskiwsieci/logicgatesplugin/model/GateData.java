@@ -1,4 +1,4 @@
-package com.piotrbednarski.logicgatesplugin.model;
+package pl.bednarskiwsieci.logicgatesplugin.model;
 
 import org.bukkit.block.BlockFace;
 

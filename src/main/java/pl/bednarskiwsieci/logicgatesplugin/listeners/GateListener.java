@@ -1,12 +1,12 @@
-package com.piotrbednarski.logicgatesplugin.listeners;
+package pl.bednarskiwsieci.logicgatesplugin.listeners;
 
-import com.piotrbednarski.logicgatesplugin.LogicGatesPlugin;
-import com.piotrbednarski.logicgatesplugin.commands.LogicGatesCommand;
-import com.piotrbednarski.logicgatesplugin.model.GateData;
-import com.piotrbednarski.logicgatesplugin.model.GateType;
-import com.piotrbednarski.logicgatesplugin.util.ConfigManager;
-import com.piotrbednarski.logicgatesplugin.util.GateUtils;
-import com.piotrbednarski.logicgatesplugin.util.UpdateChecker;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

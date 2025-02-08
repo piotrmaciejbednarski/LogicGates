@@ -1,6 +1,6 @@
 name: LogicGates
 version: ${version}
-main: com.piotrbednarski.logicgatesplugin.LogicGatesPlugin
+main: pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin
 api-version: '1.16'
 softdepend: [ Multiverse-Core, WorldEdit, AsyncWorldEdit, FastAsyncWorldEdit ]
 authors: [ Piotr Bednarski ]
