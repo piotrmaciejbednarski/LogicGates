@@ -10,6 +10,12 @@ redstoneCompatibility: false
 # The language code for messages (e.g., en, pl, es, de).
 language: en
 
+# When enabled (set to true), the plugin will use the legacy method for updating
+# redstone power. Instead of using the method setRedstonePower, it will update
+# the block by setting the outputBlock to REDSTONE_BLOCK or REDSTONE_ORE based on the output state.
+# This is useful for maintaining compatibility with older versions of the plugin or game.
+legacyMode: false
+
 update_checker:
   enabled: true
   interval_hours: 24
