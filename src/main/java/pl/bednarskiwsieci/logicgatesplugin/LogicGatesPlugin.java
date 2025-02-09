@@ -17,6 +17,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
 import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener.ROTATION_ORDER;
 
@@ -63,7 +65,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         put(Material.BROWN_CARPET, GateType.TIMER);
     }};
     // Tick management system
-    private volatile long serverTick = 0L;
+    private final AtomicLong serverTick = new AtomicLong(0);
     //endregion
     //region Plugin Settings
     private boolean particlesEnabled = true;
@@ -221,7 +223,12 @@ public class LogicGatesPlugin extends JavaPlugin {
     //region Gate management
     private void initializeTickSystem() {
         // Update tick counter every server tick (50ms)
-        Bukkit.getScheduler().runTaskTimer(this, () -> serverTick++, 0L, 1L);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                serverTick.incrementAndGet();
+            }
+        }.runTaskTimer(this, 0L, 1L);
     }
 
     private void scheduleDependentUpdates(Block outputBlock, BlockFace facing) {
@@ -269,10 +276,10 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Tick-based cooldown check (2 ticks minimum)
         Long lastTick = lastUpdateTicks.get(loc);
-        if (lastTick != null && (serverTick - lastTick) < 2) return;
+        if (lastTick != null && (serverTick.get() - lastTick) < 2) return;
 
         // Store current tick before processing
-        lastUpdateTicks.put(loc, serverTick);
+        lastUpdateTicks.put(loc, serverTick.get());
 
         // If a carpet is present at the standard output location, shift the output block one further block in the facing direction.
         if (carpetTypes.containsKey(outputBlock.getType())) {
