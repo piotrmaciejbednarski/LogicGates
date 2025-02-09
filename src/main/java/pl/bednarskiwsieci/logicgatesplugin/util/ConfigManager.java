@@ -17,6 +17,7 @@ public class ConfigManager {
     public static final String CONFIG_REDSTONE_COMPATIBILITY = "redstoneCompatibility";
     public static final String CONFIG_PARTICLES_VIEW_DISTANCE = "particlesViewDistance";
     public static final String CONFIG_LANGUAGE = "language";
+    public static final String CONFIG_LEGACY_MODE = "legacyMode";
 
     private final LogicGatesPlugin plugin;
     private File configFile;
@@ -57,6 +58,7 @@ public class ConfigManager {
         plugin.setParticlesEnabled(config.getBoolean(CONFIG_PARTICLES_ENABLED, true));
         plugin.setParticleViewDistance(config.getInt(CONFIG_PARTICLES_VIEW_DISTANCE, 16));
         plugin.setDefaultLang(config.getString(CONFIG_LANGUAGE, "en"));
+        plugin.setLegacyMode(config.getBoolean(CONFIG_LEGACY_MODE, false));
     }
 
     /// Reloads configuration from disk
@@ -77,6 +79,7 @@ public class ConfigManager {
             diskConfig.set(CONFIG_REDSTONE_COMPATIBILITY, plugin.isRedstoneCompatibility());
             diskConfig.set(CONFIG_PARTICLES_VIEW_DISTANCE, plugin.getParticleViewDistance());
             diskConfig.set(CONFIG_LANGUAGE, plugin.getDefaultLang());
+            diskConfig.set(CONFIG_LEGACY_MODE, plugin.isLegacyMode());
 
             diskConfig.save(configFile);
         } catch (IOException e) {
