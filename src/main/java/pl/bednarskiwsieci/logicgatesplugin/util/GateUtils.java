@@ -3,10 +3,7 @@ package pl.bednarskiwsieci.logicgatesplugin.util;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Lightable;
-import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.*;
 import org.bukkit.block.data.type.Comparator;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.block.data.type.RedstoneWire;
@@ -134,63 +131,67 @@ public final class GateUtils {
     ///
     /// @param block The target block to modify
     /// @param power The power level to set (0-15)
-    public static void setRedstonePower(Block block, int power) {
+    public static synchronized void setRedstonePower(Block block, int power) {
         if (block == null) return;
 
         Material type = block.getType();
         try {
+            BlockData data = block.getBlockData();
+
             switch (type) {
                 case REDSTONE_WIRE -> {
-                    RedstoneWire wire = (RedstoneWire) block.getBlockData();
-                    wire.setPower(power);
-                    block.setBlockData(wire);
+                    if (data instanceof RedstoneWire wire) {
+                        wire.setPower(power);
+                        block.setBlockData(wire);
+                    }
                 }
-                case REDSTONE_LAMP -> {
-                    // Control lamp lighting state
-                    Lightable lamp = (Lightable) block.getBlockData();
-                    lamp.setLit(power > 0);
-                    block.setBlockData(lamp);
+                case REDSTONE_LAMP, REDSTONE_TORCH, REDSTONE_WALL_TORCH, FURNACE, CAMPFIRE -> {
+                    if (data instanceof Lightable lightable) {
+                        lightable.setLit(power > 0);
+                        block.setBlockData(lightable);
+                    }
                 }
                 case REPEATER -> {
-                    Repeater repeater = (Repeater) block.getBlockData();
-                    repeater.setPowered(power > 0);
-                    block.setBlockData(repeater);
+                    if (data instanceof Repeater repeater) {
+                        repeater.setPowered(power > 0);
+                        block.setBlockData(repeater);
+                    }
                 }
                 case COMPARATOR -> {
-                    Comparator comparator = (Comparator) block.getBlockData();
-                    comparator.setPowered(power > 0);
-                    block.setBlockData(comparator);
+                    if (data instanceof Comparator comparator) {
+                        comparator.setPowered(power > 0);
+                        block.setBlockData(comparator);
+                    }
                 }
                 case PISTON, STICKY_PISTON -> {
-                    // Handle piston extension
-                    BlockData data = block.getBlockData();
-                    if (data instanceof Piston) {
-                        ((Piston) data).setExtended(power > 0);
-                        block.setBlockData(data);
+                    if (data instanceof Piston piston) {
+                        piston.setExtended(power > 0);
+                        block.setBlockData(piston);
                     }
                 }
-                case REDSTONE_TORCH, REDSTONE_WALL_TORCH, FURNACE, CAMPFIRE -> {
-                    // Control torch/fire lighting
-                    Lightable torch = (Lightable) block.getBlockData();
-                    torch.setLit(power > 0);
-                    block.setBlockData(torch);
+                case TARGET -> {
+                    if (data instanceof AnaloguePowerable target) {
+                        target.setPower(power > 0 ? 15 : 0);
+                        block.setBlockData(target);
+                    }
                 }
                 default -> {
-                    // Handle doors, trapdoors, and other powerable blocks
-                    BlockData data = block.getBlockData();
-                    if (data instanceof Openable) {
-                        ((Openable) data).setOpen(power > 0);
-                        block.setBlockData(data);
+                    if (data instanceof Openable openable) {
+                        openable.setOpen(power > 0);
+                        block.setBlockData(openable);
                     }
-                    if (data instanceof Powerable) {
-                        ((Powerable) data).setPowered(power > 0);
-                        block.setBlockData(data);
+                    if (data instanceof Powerable powerable) {
+                        powerable.setPowered(power > 0);
+                        block.setBlockData(powerable);
                     }
                 }
             }
+
             block.getState().update(true, true);
+        } catch (ClassCastException e) {
+            Bukkit.getLogger().warning("Failed to set redstone power for block (ClassCastException): " + block.getType());
         } catch (Exception e) {
-            Bukkit.getLogger().warning("Failed to set redstone power for block: " + block.getType());
+            Bukkit.getLogger().warning("Failed to set redstone power for block: " + block.getType() + " due to " + e.getMessage());
         }
     }
 
