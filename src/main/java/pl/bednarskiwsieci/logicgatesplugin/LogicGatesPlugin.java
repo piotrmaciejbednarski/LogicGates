@@ -2,10 +2,7 @@ package pl.bednarskiwsieci.logicgatesplugin;
 
 import com.sk89q.worldedit.WorldEdit;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -72,6 +69,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private int particleViewDistance = 16;
     private boolean redstoneCompatibility = false;
     private String defaultLang = "en";
+    private boolean legacyMode = false;
     //endregion
 
     //region Task Management
@@ -324,9 +322,16 @@ public class LogicGatesPlugin extends JavaPlugin {
         if (data.getType() != GateType.RS_LATCH) needsUpdate = forceUpdate || (data.getState() != output);
 
         if (needsUpdate) {
-            GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
+            if (legacyMode) {
+                outputBlock.setType(output ? Material.REDSTONE_BLOCK : Material.REDSTONE_ORE);
+            } else {
+                GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
+            }
             data.setState(output);
             debugGateUpdate(gateBlock, data, leftState, rightState, backState, output);
+
+            // Play a quiet sound at the gate's location
+            gateBlock.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 0.1f, 1.0f);
         }
 
         scheduleDependentUpdates(outputBlock, facing);
@@ -688,6 +693,9 @@ public class LogicGatesPlugin extends JavaPlugin {
     public Set<UUID> getInputToggleModePlayers() {
         return inputToggleModePlayers;
     }
+
+    public boolean isLegacyMode() { return legacyMode; }
+    public void setLegacyMode(boolean legacyMode) { this.legacyMode = legacyMode; }
 
     /// Checks if particle effects are enabled.
     ///
