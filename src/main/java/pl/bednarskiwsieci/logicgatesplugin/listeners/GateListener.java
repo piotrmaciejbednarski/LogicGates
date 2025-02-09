@@ -278,11 +278,10 @@ public class GateListener implements Listener {
                 updateChecker.isUpdateAvailable() &&
                 event.getPlayer().hasPermission("logicgates.update")) {
 
-            String message = plugin.getMessage("update_checker.notify_join")
-                    .replace("%latest%", updateChecker.getLatestVersion())
-                    .replace("%url%", updateChecker.getDownloadUrl());
+            String message = plugin.getMessage("update_checker.notify_join",
+                    updateChecker.getLatestVersion(), updateChecker.getDownloadUrl());
 
-            event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            event.getPlayer().sendMessage(message);
         }
     }
 

@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
@@ -49,7 +48,7 @@ public class UpdateChecker {
             return;
         }
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 // Create API URL
                 URL url = new URL(String.format(REPO_URL, GITHUB_USER, REPO_NAME));
@@ -87,7 +86,7 @@ public class UpdateChecker {
                     // Notify sender if update is available
                     if (sender != null) {
                         if (isUpdateAvailable()) {
-                            sendUpdateMessage(sender, downloadUrl);
+                            sendUpdateMessage(sender);
                         } else {
                             sender.sendMessage(plugin.getMessage("update_checker.up_to_date"));
                         }
@@ -98,6 +97,7 @@ public class UpdateChecker {
                 connection.disconnect();
             } catch (Exception e) {
                 plugin.getLogger().warning("Update check failed: " + e.getMessage());
+                e.printStackTrace();
                 if (sender != null) {
                     sender.sendMessage(plugin.getMessage("update_checker.failed"));
                 }
@@ -129,13 +129,10 @@ public class UpdateChecker {
         return latestParts.length > currentParts.length;
     }
 
-    public void sendUpdateMessage(CommandSender receiver, String downloadUrl) {
-        String message = plugin.getMessage("update_checker.available")
-                .replace("%latest%", latestVersion)
-                .replace("%current%", plugin.getDescription().getVersion())
-                .replace("%url%", downloadUrl);
-
-        receiver.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+    public void sendUpdateMessage(CommandSender receiver) {
+        String message = plugin.getMessage("update_checker.available",
+                latestVersion, plugin.getDescription().getVersion());
+        receiver.sendMessage(message);
     }
 
     /**

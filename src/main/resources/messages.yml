@@ -11,11 +11,11 @@ messages:
       not_a_gate: "&cThis block is not a valid logic gate!"
     update_checker:
       checking: "&6Checking for updates..."
-      available: "&eAn update is available! New version: &6%latest% &e(current: &c%current%&e)"
+      available: "&eAn update is available!\nNew version: &6%s &eCurrent: &c%s&e"
       disabled: "&cUpdate checker is disabled in config"
       failed: "&cFailed to check for updates"
       up_to_date: "&aYou're running the latest version!"
-      notify_join: "&eYour plugin is outdated! Latest: &6%latest%\n&eDownload: &n%url%"
+      notify_join: "&eYour plugin is outdated!\nLatest: &6%s\n&eDownload:\n&n%s"
       success: "&aUpdate check completed successfully"
 
     gui_title: "&0Choose gate type"
