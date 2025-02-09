@@ -3,8 +3,8 @@ package pl.bednarskiwsieci.logicgatesplugin.model;
 import org.bukkit.block.BlockFace;
 
 public class GateData {
-    private BlockFace facing;
     private final GateType type;
+    private BlockFace facing;
     private boolean state;
     private boolean isThreeInput = false;
     private long lastToggleTime;
@@ -28,7 +28,9 @@ public class GateData {
         return type;
     }
 
-    public boolean getState() { return state; }
+    public boolean getState() {
+        return state;
+    }
 
     public void setState(boolean state) {
         this.state = state;
@@ -42,12 +44,12 @@ public class GateData {
         this.lastToggleTime = lastToggleTime;
     }
 
-    public void setInterval(long interval) {
-        this.interval = interval;
-    }
-
     public long getInterval() {
         return interval;
+    }
+
+    public void setInterval(long interval) {
+        this.interval = interval;
     }
 
     public boolean isThreeInput() {

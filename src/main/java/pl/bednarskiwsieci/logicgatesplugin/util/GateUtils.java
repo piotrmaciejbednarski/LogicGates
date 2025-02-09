@@ -1,8 +1,5 @@
 package pl.bednarskiwsieci.logicgatesplugin.util;
 
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -14,6 +11,9 @@ import org.bukkit.block.data.type.Comparator;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.block.data.type.Repeater;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
 
 import java.util.Arrays;
 

@@ -1,9 +1,5 @@
 package pl.bednarskiwsieci.logicgatesplugin.commands;
 
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -21,6 +17,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 
 import java.util.List;
 import java.util.Set;
@@ -30,11 +30,10 @@ import java.util.stream.Collectors;
 /// Provides functionality for administering and interacting with logic gates in-game.
 public class LogicGatesCommand implements CommandExecutor {
 
+    private static final String ADMIN_PERMISSION = "logicgates.admin";
     private final LogicGatesPlugin plugin;
     private final ConfigManager configManager;
     private final UpdateChecker updateChecker;
-
-    private static final String ADMIN_PERMISSION = "logicgates.admin";
 
     /// Constructs a new LogicGatesCommand with a reference to the main plugin instance
     /// @param plugin The LogicGatesPlugin instance
@@ -43,6 +42,38 @@ public class LogicGatesCommand implements CommandExecutor {
         this.configManager = configManager;
         this.updateChecker = updateChecker;
     }
+
+    public static void sendClickableMessage(CommandSender sender, String instructionText, String buttonText,
+                                            ChatColor buttonColor, String url, String hoverText) {
+        // Create main instruction text component
+        TextComponent instruction = new TextComponent(instructionText);
+        instruction.setColor(ChatColor.BOLD.asBungee());  // Set text to bold style
+
+        // Create clickable button component
+        TextComponent button = new TextComponent(buttonText);
+        button.setColor(buttonColor.asBungee());     // Set button text color
+        button.setUnderlined(true);       // Add underline effect to button
+
+        // Set click event to open URL when clicked
+        button.setClickEvent(new ClickEvent(
+                ClickEvent.Action.OPEN_URL,  // Define click action type
+                url                         // URL to open
+        ));
+
+        // Add hover effect showing tooltip text
+        button.setHoverEvent(new HoverEvent(
+                HoverEvent.Action.SHOW_TEXT,  // Define hover action type
+                new ComponentBuilder(hoverText).create()           // Create hover text component
+        ));
+
+        // Combine instruction text with button component
+        instruction.addExtra(button);  // Append button to the instruction text
+
+        // Send the composed message to the player
+        sender.spigot().sendMessage(instruction);
+    }
+
+    // region Command Handlers
 
     /// Executes the given command, returning its success
     /// @param sender Source of the command
@@ -83,8 +114,6 @@ public class LogicGatesCommand implements CommandExecutor {
         }
         return true;
     }
-
-    // region Command Handlers
 
     private void handleUpdateCheck(CommandSender sender) {
         if (!validateAdminPermission(sender)) return;
@@ -228,6 +257,8 @@ public class LogicGatesCommand implements CommandExecutor {
         }
     }
 
+    //region Rotation mode
+
     /// Handles inspection mode activation
     /// @param sender Command sender
     private void handleInspectCommand(CommandSender sender) {
@@ -241,8 +272,6 @@ public class LogicGatesCommand implements CommandExecutor {
         plugin.getInspectionModePlayers().add(player.getUniqueId());
         player.sendMessage(plugin.getMessage("inspect_mode"));
     }
-
-    //region Rotation mode
 
     /// Handles rotation mode activation and gives the wand
     /// @param sender Command sender
@@ -286,6 +315,8 @@ public class LogicGatesCommand implements CommandExecutor {
         return wand;
     }
 
+    //endregion
+
     public boolean isRotationWand(ItemStack item) {
         if (item == null || item.getType() != Material.STICK) return false;
         ItemMeta meta = item.getItemMeta();
@@ -294,7 +325,9 @@ public class LogicGatesCommand implements CommandExecutor {
         return meta != null && meta.hasCustomModelData() && meta.getCustomModelData() == 1450;
     }
 
-    //endregion
+    // endregion
+
+    // region Utility Methods
 
     /// Handles plugin configuration save
     /// @param sender Command sender
@@ -303,10 +336,6 @@ public class LogicGatesCommand implements CommandExecutor {
         plugin.saveGates();
         sender.sendMessage(plugin.getMessage("save_success"));
     }
-
-    // endregion
-
-    // region Utility Methods
 
     /// Validates if sender has admin permissions
     /// @param sender Command sender
@@ -324,6 +353,10 @@ public class LogicGatesCommand implements CommandExecutor {
         sender.sendMessage(plugin.getMessage("errors.no_permission"));
         return false;
     }
+
+    // endregion
+
+    // region Information Senders
 
     /// Creates configured item stack from configuration section
     /// @param itemSection Configuration section with item data
@@ -346,40 +379,6 @@ public class LogicGatesCommand implements CommandExecutor {
 
         item.setItemMeta(meta);
         return item;
-    }
-
-    // endregion
-
-    // region Information Senders
-
-    public static void sendClickableMessage(CommandSender sender, String instructionText, String buttonText,
-                                            ChatColor buttonColor, String url, String hoverText) {
-        // Create main instruction text component
-        TextComponent instruction = new TextComponent(instructionText);
-        instruction.setColor(ChatColor.BOLD.asBungee());  // Set text to bold style
-
-        // Create clickable button component
-        TextComponent button = new TextComponent(buttonText);
-        button.setColor(buttonColor.asBungee());     // Set button text color
-        button.setUnderlined(true);       // Add underline effect to button
-
-        // Set click event to open URL when clicked
-        button.setClickEvent(new ClickEvent(
-                ClickEvent.Action.OPEN_URL,  // Define click action type
-                url                         // URL to open
-        ));
-
-        // Add hover effect showing tooltip text
-        button.setHoverEvent(new HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,  // Define hover action type
-                new ComponentBuilder(hoverText).create()           // Create hover text component
-        ));
-
-        // Combine instruction text with button component
-        instruction.addExtra(button);  // Append button to the instruction text
-
-        // Send the composed message to the player
-        sender.spigot().sendMessage(instruction);
     }
 
     /// Sends how-to instructions to sender

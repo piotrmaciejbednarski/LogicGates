@@ -1,14 +1,5 @@
 package pl.bednarskiwsieci.logicgatesplugin;
 
-import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
-import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
-import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
-import pl.bednarskiwsieci.logicgatesplugin.util.GatesConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import com.sk89q.worldedit.WorldEdit;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -27,6 +18,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
+import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
+import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.util.GatesConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 
 import java.io.File;
 import java.util.*;
@@ -48,11 +48,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private final Set<UUID> inputToggleModePlayers = new HashSet<>();
     private final Set<UUID> cooldownModePlayers = new HashSet<>();
     private final Map<UUID, Integer> pendingCooldowns = new HashMap<>();
-
-    // Tick management system
-    private volatile long serverTick = 0L;
     private final ConcurrentHashMap<Location, Long> lastUpdateTicks = new ConcurrentHashMap<>();
-
     // Mapping of carpet colors to gate types
     private final Map<Material, GateType> carpetTypes = new HashMap<>() {{
         put(Material.RED_CARPET, GateType.XOR);
@@ -66,8 +62,9 @@ public class LogicGatesPlugin extends JavaPlugin {
         put(Material.ORANGE_CARPET, GateType.RS_LATCH);
         put(Material.BROWN_CARPET, GateType.TIMER);
     }};
+    // Tick management system
+    private volatile long serverTick = 0L;
     //endregion
-
     //region Plugin Settings
     private boolean particlesEnabled = true;
     private int particleViewDistance = 16;
@@ -168,6 +165,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Language support
+
     /// Retrieves a localized message with a prefix from the configuration.
     ///
     /// The method looks up the message under "messages.&lt;currentLang&gt;.&lt;key&gt;".
@@ -237,7 +235,7 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         directions.forEach(dir -> {
             Location dependentLoc = outputBlock.getRelative(dir).getLocation();
-            if(gates.containsKey(dependentLoc)) {
+            if (gates.containsKey(dependentLoc)) {
                 gatesToUpdate.offer(dependentLoc);
             }
         });
@@ -271,7 +269,7 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Tick-based cooldown check (2 ticks minimum)
         Long lastTick = lastUpdateTicks.get(loc);
-        if(lastTick != null && (serverTick - lastTick) < 2) return;
+        if (lastTick != null && (serverTick - lastTick) < 2) return;
 
         // Store current tick before processing
         lastUpdateTicks.put(loc, serverTick);
@@ -329,6 +327,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Redstone state methods
+
     /// Checks the redstone state at a specific face of a block
     /// @param gateBlock The base block of the gate
     /// @param face The face to check for redstone input
@@ -348,7 +347,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     ///
     /// @param targetBlock the block to check
     /// @param type the material type of the redstone component
-    /// @return `true` if the component is active, `false` otherwise
+    /// @return `true` if the component is active,`false` otherwise
     private boolean checkStandardRedstoneComponents(Block targetBlock, Material type) {
         // Retrieve the block data once to avoid repeated calls
         BlockData data = targetBlock.getBlockData();
@@ -379,7 +378,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// @param targetBlock the block to check
     /// @param type the material type of the redstone component
     /// @param face the specific block face to consider for directional components
-    /// @return `true` if the component is active in compatibility mode, `false` otherwise
+    /// @return `true` if the component is active in compatibility mode,`false` otherwise
     private boolean checkCompatibilityRedstoneComponents(Block targetBlock, Material type, BlockFace face) {
         // Retrieve the block data once to avoid repeated calls
         BlockData data = targetBlock.getBlockData();
@@ -412,13 +411,14 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Utility Methods
+
     /// Checks if the gate has an activation carpet.
     ///
     /// The method determines whether there is a carpet block one block above the given gate block.
     ///
     ///
     /// @param gate the gate block to check for an activation carpet
-    /// @return `true` if the block above the gate is a carpet from the predefined types, `false` otherwise
+    /// @return `true` if the block above the gate is a carpet from the predefined types,`false` otherwise
     public boolean hasActivationCarpet(Block gate) {
         return carpetTypes.containsKey(gate.getRelative(BlockFace.UP).getType());
     }
@@ -498,6 +498,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Task Scheduling
+
     /// Starts all scheduled tasks for gate updates, particles, and processing.
     private void startScheduledTasks() {
         initializeTickSystem();
@@ -536,15 +537,15 @@ public class LogicGatesPlugin extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             // Process in batches
             List<Location> batch = new ArrayList<>(gatesToUpdate.size());
-            while(true) {
+            while (true) {
                 Location loc = gatesToUpdate.poll();
-                if(loc == null) break;
+                if (loc == null) break;
                 batch.add(loc);
             }
 
             batch.forEach(loc -> {
                 Block block = loc.getBlock();
-                if(block.getType() == Material.GLASS) {
+                if (block.getType() == Material.GLASS) {
                     updateGate(block);
                 }
             });
@@ -563,6 +564,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Debugging and Messages
+
     /// Sends a debug update message for a gate to all registered debug players.
     ///
     /// @param gateBlock   the block representing the gate
@@ -577,14 +579,14 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Create a debug message using a text block
         String debugInfo = String.format("""
-            &6[DEBUG]&e Gate at %s
-            &7Type:&f %s
-            &7Facing:&f %s
-            &7Input 1:&f %s
-            &7Input 2:&f %s
-            &7Input 3:&f %s
-            &7Output:&f %s
-            """,
+                        &6[DEBUG]&e Gate at %s
+                        &7Type:&f %s
+                        &7Facing:&f %s
+                        &7Input 1:&f %s
+                        &7Input 2:&f %s
+                        &7Input 3:&f %s
+                        &7Output:&f %s
+                        """,
                 formatLocation(gateBlock.getLocation()),
                 data.getType().name(),
                 data.getFacing().name(),
@@ -625,6 +627,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Getters/Setters
+
     /// Returns the map of gate locations and their corresponding data.
     ///
     /// @return the gates map

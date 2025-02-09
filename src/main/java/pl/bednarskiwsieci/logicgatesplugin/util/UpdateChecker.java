@@ -5,11 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -22,26 +22,13 @@ public class UpdateChecker {
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
-
-    private final LogicGatesPlugin plugin;
-    private String latestVersion;
-    private long lastCheckTime;
-
     // GitHub repository details (CHANGE THESE)
     private static final String GITHUB_USER = "piotrmaciejbednarski";
     private static final String REPO_NAME = "LogicGates";
     private static final String REPO_URL = "https://api.github.com/repos/%s/%s/releases/latest";
-
-    /**
-     * Data class for GitHub API response
-     */
-    private static class GitHubRelease {
-        @SerializedName("tag_name")
-        String tagName;
-
-        @SerializedName("html_url")
-        String htmlUrl;
-    }
+    private final LogicGatesPlugin plugin;
+    private String latestVersion;
+    private long lastCheckTime;
 
     public UpdateChecker(LogicGatesPlugin plugin) {
         this.plugin = plugin;
@@ -172,5 +159,16 @@ public class UpdateChecker {
         return String.format("https://github.com/%s/%s/releases/latest",
                 GITHUB_USER,
                 REPO_NAME);
+    }
+
+    /**
+     * Data class for GitHub API response
+     */
+    private static class GitHubRelease {
+        @SerializedName("tag_name")
+        String tagName;
+
+        @SerializedName("html_url")
+        String htmlUrl;
     }
 }

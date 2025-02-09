@@ -11,7 +11,7 @@ commands:
   logicgates:
     description: LogicGates Plugin
     usage: /logicgates [help|menu|update|toggleinput|inspect|rotate|save|fixparticles|particles|language|author]
-    aliases: [lg]
+    aliases: [ lg ]
 permissions:
   logicgates.place:
     description: Allows placing logic gates

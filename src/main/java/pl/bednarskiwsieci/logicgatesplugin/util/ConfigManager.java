@@ -1,8 +1,8 @@
 package pl.bednarskiwsieci.logicgatesplugin.util;
 
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 
 import java.io.File;
 import java.io.IOException;

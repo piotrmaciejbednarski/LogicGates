@@ -2,10 +2,10 @@ package pl.bednarskiwsieci.logicgatesplugin.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
 
 import java.io.File;
 import java.io.FileReader;
@@ -58,7 +58,8 @@ public class GatesConfigManager {
     public void loadGates(ConcurrentHashMap<Location, GateData> gates) {
         try (FileReader reader = new FileReader(gatesFile)) {
             Map<String, GateData> serializedGates = gson.fromJson(reader,
-                    new com.google.gson.reflect.TypeToken<Map<String, GateData>>(){}.getType()
+                    new com.google.gson.reflect.TypeToken<Map<String, GateData>>() {
+                    }.getType()
             );
 
             if (serializedGates == null) return;

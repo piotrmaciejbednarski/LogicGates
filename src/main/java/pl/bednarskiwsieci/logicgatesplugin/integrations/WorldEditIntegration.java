@@ -1,10 +1,5 @@
 package pl.bednarskiwsieci.logicgatesplugin.integrations;
 
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
-import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -17,6 +12,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
 
 public class WorldEditIntegration {
     private final LogicGatesPlugin plugin;

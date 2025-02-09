@@ -1,12 +1,5 @@
 package pl.bednarskiwsieci.logicgatesplugin.listeners;
 
-import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
-import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
-import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,6 +22,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
+import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,12 +38,11 @@ import java.util.stream.Collectors;
 /// This includes block placement, block breaking, redstone changes, player interactions, and player quit events.
 public class GateListener implements Listener {
 
+    // Define the rotation order for gate directions (North -> East -> South -> West)
+    public static final BlockFace[] ROTATION_ORDER = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
     private final LogicGatesPlugin plugin;
     private final ConfigManager configManager;
     private final UpdateChecker updateChecker;
-
-    // Define the rotation order for gate directions (North -> East -> South -> West)
-    public static final BlockFace[] ROTATION_ORDER = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 
     /// Constructor for GateListener.
     ///
@@ -325,8 +324,8 @@ public class GateListener implements Listener {
 
             if (
                     data.getType() == GateType.TIMER
-                    || data.getType() == GateType.NOT
-                    || data.getType() == GateType.RS_LATCH
+                            || data.getType() == GateType.NOT
+                            || data.getType() == GateType.RS_LATCH
             ) {
                 plugin.getInputToggleModePlayers().remove(player.getUniqueId());
                 return; // Ignore TIMER, NOT, RS_LATCH gates
@@ -450,8 +449,7 @@ public class GateListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
-        Player player = (Player) event.getWhoClicked();
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         // Check if it's our GUI
         String guiTitle = ChatColor.translateAlternateColorCodes('&', plugin.getMessageWithoutPrefix("gui_title"));
