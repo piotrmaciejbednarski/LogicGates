@@ -16,6 +16,10 @@ language: en
 # This is useful for maintaining compatibility with older versions of the plugin or game.
 legacyMode: false
 
+# Define the position of the input for NOT gate
+# Options: default, opposite
+notGateInputPosition: default
+
 update_checker:
   enabled: true
   interval_hours: 24

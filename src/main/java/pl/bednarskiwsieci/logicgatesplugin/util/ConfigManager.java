@@ -18,6 +18,7 @@ public class ConfigManager {
     public static final String CONFIG_PARTICLES_VIEW_DISTANCE = "particlesViewDistance";
     public static final String CONFIG_LANGUAGE = "language";
     public static final String CONFIG_LEGACY_MODE = "legacyMode";
+    public static final String CONFIG_NOT_GATE_INPUT_POSITION = "notGateInputPosition";
 
     private final LogicGatesPlugin plugin;
     private File configFile;
@@ -59,6 +60,7 @@ public class ConfigManager {
         plugin.setParticleViewDistance(config.getInt(CONFIG_PARTICLES_VIEW_DISTANCE, 16));
         plugin.setDefaultLang(config.getString(CONFIG_LANGUAGE, "en"));
         plugin.setLegacyMode(config.getBoolean(CONFIG_LEGACY_MODE, false));
+        plugin.setNotGateInputPosition(config.getString(CONFIG_NOT_GATE_INPUT_POSITION, "default"));
     }
 
     /// Reloads configuration from disk
@@ -80,6 +82,7 @@ public class ConfigManager {
             diskConfig.set(CONFIG_PARTICLES_VIEW_DISTANCE, plugin.getParticleViewDistance());
             diskConfig.set(CONFIG_LANGUAGE, plugin.getDefaultLang());
             diskConfig.set(CONFIG_LEGACY_MODE, plugin.isLegacyMode());
+            diskConfig.set(CONFIG_NOT_GATE_INPUT_POSITION, plugin.getNotGateInputPosition());
 
             diskConfig.save(configFile);
         } catch (IOException e) {

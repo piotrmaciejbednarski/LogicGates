@@ -29,7 +29,8 @@ public final class GateUtils {
     /// @param loc The location to convert
     /// @return String in format "worldName_x_y_z" or "invalid_0_0_0" for null input
     public static String convertLocationToString(Location loc) {
-        if (loc == null || loc.getWorld() == null) return "invalid_0_0_0";
+        if (loc == null || loc.getWorld() == null)
+            return "invalid_0_0_0";
         return String.format("%s_%d_%d_%d",
                 loc.getWorld().getName(),
                 loc.getBlockX(),
@@ -67,7 +68,7 @@ public final class GateUtils {
     /// @return New rotated BlockFace
     public static BlockFace rotateClockwise(BlockFace face, BlockFace[] rotationOrder) {
         int index = Arrays.asList(rotationOrder).indexOf(face);
-        return rotationOrder[(index + 1) % 4];  // Next index
+        return rotationOrder[(index + 1) % 4]; // Next index
     }
 
     /// Rotates a BlockFace counter-clockwise based on the provided rotation order.
@@ -77,7 +78,7 @@ public final class GateUtils {
     /// @return New rotated BlockFace
     public static BlockFace rotateCounterClockwise(BlockFace face, BlockFace[] rotationOrder) {
         int index = Arrays.asList(rotationOrder).indexOf(face);
-        return rotationOrder[(index + 3) % 4];  // Previous index
+        return rotationOrder[(index + 3) % 4]; // Previous index
     }
 
     /// Calculates the output of a logic gate based on its type and inputs.
@@ -86,7 +87,8 @@ public final class GateUtils {
     /// @param input1 First input state
     /// @param input2 Second input state (ignored for single-input gates)
     /// @return Resulting output state
-    public static boolean calculateOutput(GateType type, boolean input1, boolean input2, boolean input3, GateData data) {
+    public static boolean calculateOutput(GateType type, boolean input1, boolean input2, boolean input3,
+            GateData data) {
         boolean isThreeInput = data.isThreeInput();
         return switch (type) {
             case XNOR -> isThreeInput ? (input1 == input2 && input2 == input3) : (input1 == input2);
@@ -132,7 +134,8 @@ public final class GateUtils {
     /// @param block The target block to modify
     /// @param power The power level to set (0-15)
     public static synchronized void setRedstonePower(Block block, int power) {
-        if (block == null) return;
+        if (block == null)
+            return;
 
         Material type = block.getType();
         try {
@@ -189,9 +192,11 @@ public final class GateUtils {
 
             block.getState().update(true, true);
         } catch (ClassCastException e) {
-            Bukkit.getLogger().warning("Failed to set redstone power for block (ClassCastException): " + block.getType());
+            Bukkit.getLogger()
+                    .warning("Failed to set redstone power for block (ClassCastException): " + block.getType());
         } catch (Exception e) {
-            Bukkit.getLogger().warning("Failed to set redstone power for block: " + block.getType() + " due to " + e.getMessage());
+            Bukkit.getLogger().warning(
+                    "Failed to set redstone power for block: " + block.getType() + " due to " + e.getMessage());
         }
     }
 
@@ -203,21 +208,21 @@ public final class GateUtils {
     /// @param facing Direction the gate is facing
     /// @param viewDistance Maximum distance from which particles are visible
     public static void showParticles(LogicGatesPlugin plugin,
-                                     Block gateBlock,
-                                     GateType gateType,
-                                     BlockFace facing,
-                                     double viewDistance) {
+            Block gateBlock,
+            GateType gateType,
+            BlockFace facing,
+            double viewDistance) {
         World world = gateBlock.getWorld();
         Location center = gateBlock.getLocation().add(0.5, 0.5, 0.5);
 
         // Check if any player is within view distance
-        boolean shouldRender = Bukkit.getOnlinePlayers().stream().anyMatch(p ->
-                p.getWorld().equals(world) &&
-                        p.getLocation().distanceSquared(center) <= viewDistance * viewDistance);
-        if (!shouldRender) return;
+        boolean shouldRender = Bukkit.getOnlinePlayers().stream().anyMatch(p -> p.getWorld().equals(world) &&
+                p.getLocation().distanceSquared(center) <= viewDistance * viewDistance);
+        if (!shouldRender)
+            return;
 
         // Calculate particle positions relative to gate facing
-        double offsetDistance = 0.7;  // Distance from center for input/output markers
+        double offsetDistance = 0.7; // Distance from center for input/output markers
         Location inputLocation = center.clone().add(
                 rotateCounterClockwise(facing, ROTATION_ORDER).getDirection().multiply(offsetDistance));
         Location secondInputLocation = center.clone().add(
@@ -241,9 +246,12 @@ public final class GateUtils {
 
         // Spawn input particles based on gate type
         if (gateType == GateType.NOT) {
+            // Determine NOT input location based on plugin configuration
+            Location notGateInputLocation = plugin.getNotGateInputPosition().equals("opposite") ? thirdInputLocation
+                    : inputLocation;
             // Single red input for NOT gate
             world.spawnParticle(Particle.REDSTONE,
-                    inputLocation,
+                    notGateInputLocation,
                     5, new Particle.DustOptions(Color.RED, 1));
         } else if (gateType == GateType.TIMER) {
             // Special handling for timer gate
