@@ -40,7 +40,7 @@ import static pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener.ROTATIO
 /// Handles gate management, configuration, and event processing.
 public class LogicGatesPlugin extends JavaPlugin {
 
-    //region Data Storage
+    // region Data Storage
     private final ConcurrentHashMap<Location, GateData> gates = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<Location> gatesToUpdate = new ConcurrentLinkedQueue<>();
     private final Set<UUID> debugPlayers = new HashSet<>();
@@ -51,38 +51,41 @@ public class LogicGatesPlugin extends JavaPlugin {
     private final Map<UUID, Integer> pendingCooldowns = new HashMap<>();
     private final ConcurrentHashMap<Location, Long> lastUpdateTicks = new ConcurrentHashMap<>();
     // Mapping of carpet colors to gate types
-    private final Map<Material, GateType> carpetTypes = new HashMap<>() {{
-        put(Material.RED_CARPET, GateType.XOR);
-        put(Material.BLUE_CARPET, GateType.AND);
-        put(Material.GREEN_CARPET, GateType.OR);
-        put(Material.BLACK_CARPET, GateType.NOT);
-        put(Material.YELLOW_CARPET, GateType.NAND);
-        put(Material.WHITE_CARPET, GateType.NOR);
-        put(Material.CYAN_CARPET, GateType.XNOR);
-        put(Material.MAGENTA_CARPET, GateType.IMPLICATION);
-        put(Material.ORANGE_CARPET, GateType.RS_LATCH);
-        put(Material.BROWN_CARPET, GateType.TIMER);
-    }};
+    private final Map<Material, GateType> carpetTypes = new HashMap<>() {
+        {
+            put(Material.RED_CARPET, GateType.XOR);
+            put(Material.BLUE_CARPET, GateType.AND);
+            put(Material.GREEN_CARPET, GateType.OR);
+            put(Material.BLACK_CARPET, GateType.NOT);
+            put(Material.YELLOW_CARPET, GateType.NAND);
+            put(Material.WHITE_CARPET, GateType.NOR);
+            put(Material.CYAN_CARPET, GateType.XNOR);
+            put(Material.MAGENTA_CARPET, GateType.IMPLICATION);
+            put(Material.ORANGE_CARPET, GateType.RS_LATCH);
+            put(Material.BROWN_CARPET, GateType.TIMER);
+        }
+    };
     // Tick management system
     private final AtomicLong serverTick = new AtomicLong(0);
-    //endregion
-    //region Plugin Settings
+    // endregion
+    // region Plugin Settings
     private boolean particlesEnabled = true;
     private int particleViewDistance = 16;
     private boolean redstoneCompatibility = false;
     private String defaultLang = "en";
     private boolean legacyMode = false;
-    //endregion
+    private String notGateInputPosition = "default";
+    // endregion
 
-    //region Task Management
+    // region Task Management
     private BukkitTask timerGateUpdateTask;
     private BukkitTask particleTask;
     private ConfigManager configManager;
     private GatesConfigManager gatesConfigManager;
     private UpdateChecker updateChecker;
-    //endregion
+    // endregion
 
-    //region Plugin Lifecycle
+    // region Plugin Lifecycle
     @Override
     public void onEnable() {
         initializeConfigFiles();
@@ -105,9 +108,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         getLogger().info(
                 String.format("Version %s (API %s) Enabled - made by Piotr Bednarski",
                         getDescription().getVersion(),
-                        getDescription().getAPIVersion()
-                )
-        );
+                        getDescription().getAPIVersion()));
 
         // Initialize bStats
         int BSTATS_ID = 24700;
@@ -147,26 +148,26 @@ public class LogicGatesPlugin extends JavaPlugin {
         getLogger().info(
                 String.format("Version %s (API %s) Disabled - made by Piotr Bednarski",
                         getDescription().getVersion(),
-                        getDescription().getAPIVersion()
-                )
-        );
+                        getDescription().getAPIVersion()));
     }
-    //endregion
+    // endregion
 
-    //region Configuration Management
+    // region Configuration Management
     private void initializeConfigFiles() {
         File messagesFile = new File(getDataFolder(), "messages.yml");
-        if (!messagesFile.exists()) saveResource("messages.yml", false);
+        if (!messagesFile.exists())
+            saveResource("messages.yml", false);
 
         File configFile = new File(getDataFolder(), ConfigManager.CONFIG_FILE_NAME);
-        if (!configFile.exists()) saveResource(ConfigManager.CONFIG_FILE_NAME, false);
+        if (!configFile.exists())
+            saveResource(ConfigManager.CONFIG_FILE_NAME, false);
     }
-    //endregion
+    // endregion
 
-    //region Component Registration
+    // region Component Registration
     private boolean isWorldEditPresent() {
         Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
-        for(Plugin plugin : plugins) {
+        for (Plugin plugin : plugins) {
             if (plugin.getName().toLowerCase().contains("worldedit")) {
                 return true;
             }
@@ -175,24 +176,28 @@ public class LogicGatesPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        Objects.requireNonNull(getCommand("logicgates")).setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
+        Objects.requireNonNull(getCommand("logicgates"))
+                .setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
     }
 
     private void registerEventListeners() {
         getServer().getPluginManager().registerEvents(new GateListener(this, configManager, updateChecker), this);
     }
-    //endregion
+    // endregion
 
-    //region Language support
+    // region Language support
 
     /// Retrieves a localized message with a prefix from the configuration.
     ///
-    /// The method looks up the message under "messages.&lt;currentLang&gt;.&lt;key&gt;".
-    /// If the message is not found, it falls back to the English version and adds a missing translation notice.
-    /// It then appends the configured prefix (if any) to the message and translates color codes.
+    /// The method looks up the message under
+    /// "messages.&lt;currentLang&gt;.&lt;key&gt;".
+    /// If the message is not found, it falls back to the English version and adds a
+    /// missing translation notice.
+    /// It then appends the configured prefix (if any) to the message and translates
+    /// color codes.
     ///
     ///
-    /// @param key  the key of the message to retrieve
+    /// @param key the key of the message to retrieve
     /// @param args optional arguments to be formatted into the message
     /// @return the formatted message with the prefix and color codes translated
     public String getMessage(String key, Object... args) {
@@ -200,7 +205,8 @@ public class LogicGatesPlugin extends JavaPlugin {
         String currentLang = defaultLang;
         // Construct the configuration key for the message.
         String messageKey = "messages." + currentLang + "." + key;
-        // Retrieve the message from the configuration; default to an empty string if not found.
+        // Retrieve the message from the configuration; default to an empty string if
+        // not found.
         String message = getMessages().getString(messageKey, "");
         // If the message is empty, fall back to the English translation.
         if (message.isEmpty()) {
@@ -208,25 +214,30 @@ public class LogicGatesPlugin extends JavaPlugin {
         }
         // Retrieve the prefix for the current language, if defined.
         String prefix = getMessages().getString("messages." + currentLang + ".prefix", "");
-        // Format the message with the provided arguments, append the prefix, and translate color codes.
+        // Format the message with the provided arguments, append the prefix, and
+        // translate color codes.
         return ChatColor.translateAlternateColorCodes('&', prefix + String.format(message, args));
     }
 
     /// Retrieves a localized message without a prefix from the configuration.
     ///
-    /// This method functions similarly to [#getMessage(String,Object...)], but it does not prepend
-    /// any prefix to the message. If the message is missing in the current language, it falls back to the English version.
+    /// This method functions similarly to [#getMessage(String,Object...)], but it
+    /// does not prepend
+    /// any prefix to the message. If the message is missing in the current
+    /// language, it falls back to the English version.
     ///
     ///
-    /// @param key  the key of the message to retrieve
+    /// @param key the key of the message to retrieve
     /// @param args optional arguments to be formatted into the message
-    /// @return the formatted message without the prefix, with color codes translated
+    /// @return the formatted message without the prefix, with color codes
+    /// translated
     public String getMessageWithoutPrefix(String key, Object... args) {
         // Determine the current language setting.
         String currentLang = defaultLang;
         // Construct the configuration key for the message.
         String messageKey = "messages." + currentLang + "." + key;
-        // Retrieve the message from the configuration; default to an empty string if not found.
+        // Retrieve the message from the configuration; default to an empty string if
+        // not found.
         String message = getMessages().getString(messageKey, "");
         // If the message is empty, fall back to the English translation.
         if (message.isEmpty()) {
@@ -235,9 +246,9 @@ public class LogicGatesPlugin extends JavaPlugin {
         // Format the message with the provided arguments and translate color codes.
         return ChatColor.translateAlternateColorCodes('&', String.format(message, args));
     }
-    //endregion
+    // endregion
 
-    //region Gate management
+    // region Gate management
     private void initializeTickSystem() {
         // Update tick counter every server tick (50ms)
         new BukkitRunnable() {
@@ -254,8 +265,7 @@ public class LogicGatesPlugin extends JavaPlugin {
                 facing,
                 facing.getOppositeFace(),
                 GateUtils.rotateClockwise(facing, ROTATION_ORDER),
-                GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER)
-        );
+                GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER));
 
         directions.forEach(dir -> {
             Location dependentLoc = outputBlock.getRelative(dir).getLocation();
@@ -267,9 +277,12 @@ public class LogicGatesPlugin extends JavaPlugin {
 
     /// Updates the gate's output based on its current redstone inputs
     ///
-    /// This method checks if the gate has the proper activation carpet and if the cooldown period
-    /// has elapsed before processing the inputs. It then calculates the new output state, plays a sound
-    /// for feedback, and schedules the update of the redstone power on the output block.
+    /// This method checks if the gate has the proper activation carpet and if the
+    /// cooldown period
+    /// has elapsed before processing the inputs. It then calculates the new output
+    /// state, plays a sound
+    /// for feedback, and schedules the update of the redstone power on the output
+    /// block.
     ///
     ///
     /// @param gateBlock the block representing the gate
@@ -279,8 +292,10 @@ public class LogicGatesPlugin extends JavaPlugin {
         // Retrieve the stored data for the gate at this location.
         GateData data = gates.get(loc);
 
-        // If no data is found or if the gate doesn't have the required activation carpet
-        if (data == null || !hasActivationCarpet(gateBlock)) return;
+        // If no data is found or if the gate doesn't have the required activation
+        // carpet
+        if (data == null || !hasActivationCarpet(gateBlock))
+            return;
 
         // Get the output block relative to the gate's facing direction.
         final BlockFace facing = data.getFacing();
@@ -293,12 +308,14 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Tick-based cooldown check (2 ticks minimum)
         Long lastTick = lastUpdateTicks.get(loc);
-        if (lastTick != null && (serverTick.get() - lastTick) < 2) return;
+        if (lastTick != null && (serverTick.get() - lastTick) < 2)
+            return;
 
         // Store current tick before processing
         lastUpdateTicks.put(loc, serverTick.get());
 
-        // If a carpet is present at the standard output location, shift the output block one further block in the facing direction.
+        // If a carpet is present at the standard output location, shift the output
+        // block one further block in the facing direction.
         if (carpetTypes.containsKey(outputBlock.getType())) {
             outputBlock = outputBlock.getRelative(facing, 1);
         }
@@ -311,10 +328,22 @@ public class LogicGatesPlugin extends JavaPlugin {
         boolean rightState;
         boolean backState;
 
-        // Determine the redstone input states from the left and right sides of the gate.
+        // Determine the redstone input states from the left and right sides
         leftState = getRedstoneState(gateBlock, leftFacing);
         rightState = getRedstoneState(gateBlock, rightFacing);
         backState = false;
+
+        if (data.getType() == GateType.NOT) {
+            // Get the input position configuration for NOT gate
+            String notInputLocation = getNotGateInputPosition();
+            // Check if the input position is set to "opposite"
+            if (notInputLocation.equals("opposite")) {
+                // Set the left state to the opposite face of gate
+                BlockFace currentFacing = facing.getOppositeFace();
+                leftState = getRedstoneState(gateBlock, currentFacing);
+                leftFacing = currentFacing;
+            }
+        }
 
         if (data.isThreeInput()) {
             backState = getRedstoneState(gateBlock, backFacing);
@@ -324,9 +353,12 @@ public class LogicGatesPlugin extends JavaPlugin {
         }
 
         // Force false if input block is air
-        if (gateBlock.getRelative(leftFacing).getType() == Material.AIR) leftState = false;
-        if (gateBlock.getRelative(rightFacing).getType() == Material.AIR) rightState = false;
-        if (gateBlock.getRelative(backFacing).getType() == Material.AIR) backState = false;
+        if (gateBlock.getRelative(leftFacing).getType() == Material.AIR)
+            leftState = false;
+        if (gateBlock.getRelative(rightFacing).getType() == Material.AIR)
+            rightState = false;
+        if (gateBlock.getRelative(backFacing).getType() == Material.AIR)
+            backState = false;
 
         // Calculate the output state based on the gate's type and the input states.
         boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, backState, data);
@@ -338,7 +370,8 @@ public class LogicGatesPlugin extends JavaPlugin {
         boolean needsUpdate = true;
 
         // Ignore checking when RS_LATCH
-        if (data.getType() != GateType.RS_LATCH) needsUpdate = forceUpdate || (data.getState() != output);
+        if (data.getType() != GateType.RS_LATCH)
+            needsUpdate = forceUpdate || (data.getState() != output);
 
         if (needsUpdate) {
             if (legacyMode) {
@@ -355,9 +388,9 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         scheduleDependentUpdates(outputBlock, facing);
     }
-    //endregion
+    // endregion
 
-    //region Redstone state methods
+    // region Redstone state methods
 
     /// Checks the redstone state at a specific face of a block
     /// @param gateBlock The base block of the gate
@@ -366,7 +399,8 @@ public class LogicGatesPlugin extends JavaPlugin {
     public boolean getRedstoneState(Block gateBlock, BlockFace face) {
         Block targetBlock = gateBlock.getRelative(face);
         Material type = targetBlock.getType();
-        if (type == Material.AIR) return false;
+        if (type == Material.AIR)
+            return false;
 
         if (!redstoneCompatibility) {
             return checkStandardRedstoneComponents(targetBlock, type);
@@ -374,7 +408,8 @@ public class LogicGatesPlugin extends JavaPlugin {
         return checkCompatibilityRedstoneComponents(targetBlock, type, face);
     }
 
-    /// Checks if the given block, when used as a standard redstone component, is active (powered).
+    /// Checks if the given block, when used as a standard redstone component, is
+    /// active (powered).
     ///
     /// @param targetBlock the block to check
     /// @param type the material type of the redstone component
@@ -404,12 +439,14 @@ public class LogicGatesPlugin extends JavaPlugin {
         }
     }
 
-    /// Checks if the given block, when used as a redstone component in compatibility mode, is active.
+    /// Checks if the given block, when used as a redstone component in
+    /// compatibility mode, is active.
     ///
     /// @param targetBlock the block to check
     /// @param type the material type of the redstone component
     /// @param face the specific block face to consider for directional components
-    /// @return `true` if the component is active in compatibility mode,`false` otherwise
+    /// @return `true` if the component is active in compatibility mode,`false`
+    /// otherwise
     private boolean checkCompatibilityRedstoneComponents(Block targetBlock, Material type, BlockFace face) {
         // Retrieve the block data once to avoid repeated calls
         BlockData data = targetBlock.getBlockData();
@@ -419,7 +456,8 @@ public class LogicGatesPlugin extends JavaPlugin {
                 // Check if the wall torch is lit
                 return ((Lightable) data).isLit();
             case REDSTONE_WIRE:
-                // For redstone wire, ensure the connection on the given face is of type SIDE and the block is powered
+                // For redstone wire, ensure the connection on the given face is of type SIDE
+                // and the block is powered
                 RedstoneWire wire = (RedstoneWire) data;
                 return wire.getFace(face) == RedstoneWire.Connection.SIDE && targetBlock.getBlockPower() > 0;
             case REDSTONE_BLOCK:
@@ -439,25 +477,29 @@ public class LogicGatesPlugin extends JavaPlugin {
                 return targetBlock.getBlockPower() > 0;
         }
     }
-    //endregion
+    // endregion
 
-    //region Utility Methods
+    // region Utility Methods
 
     /// Checks if the gate has an activation carpet.
     ///
-    /// The method determines whether there is a carpet block one block above the given gate block.
+    /// The method determines whether there is a carpet block one block above the
+    /// given gate block.
     ///
     ///
     /// @param gate the gate block to check for an activation carpet
-    /// @return `true` if the block above the gate is a carpet from the predefined types,`false` otherwise
+    /// @return `true` if the block above the gate is a carpet from the predefined
+    /// types,`false` otherwise
     public boolean hasActivationCarpet(Block gate) {
         return carpetTypes.containsKey(gate.getRelative(BlockFace.UP).getType());
     }
 
     /// Rotates the gate's facing direction.
     ///
-    /// The method retrieves the current gate data and calculates the new facing based on the predefined rotation order.
-    /// It then updates the gate data, stores it, and triggers an update for the gate.
+    /// The method retrieves the current gate data and calculates the new facing
+    /// based on the predefined rotation order.
+    /// It then updates the gate data, stores it, and triggers an update for the
+    /// gate.
     ///
     ///
     /// @param gateBlock the gate block to rotate
@@ -526,9 +568,9 @@ public class LogicGatesPlugin extends JavaPlugin {
             player.sendMessage("Debug mode ON");
         }
     }
-    //endregion
+    // endregion
 
-    //region Task Scheduling
+    // region Task Scheduling
 
     /// Starts all scheduled tasks for gate updates, particles, and processing.
     private void startScheduledTasks() {
@@ -541,18 +583,19 @@ public class LogicGatesPlugin extends JavaPlugin {
     /// Starts a repeating task to update timer gates every tick.
     private void startTimerUpdateTask() {
         timerGateUpdateTask = Bukkit.getScheduler().runTaskTimer(this, () ->
-                // Iterate over all gates and update those of TIMER type
-                gates.forEach((loc, data) -> {
-                    if (data.getType() == GateType.TIMER) {
-                        updateGate(loc.getBlock());
-                    }
-                }), 0L, 1L);
+        // Iterate over all gates and update those of TIMER type
+        gates.forEach((loc, data) -> {
+            if (data.getType() == GateType.TIMER) {
+                updateGate(loc.getBlock());
+            }
+        }), 0L, 1L);
     }
 
     /// Starts a repeating task to display particles near gates.
     private void startParticleTask() {
         particleTask = Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if (!particlesEnabled) return; // Exit if particles are disabled
+            if (!particlesEnabled)
+                return; // Exit if particles are disabled
             gates.forEach((loc, data) -> {
                 Block gateBlock = loc.getBlock();
                 // Only show particles for glass gates with an activation carpet
@@ -570,7 +613,8 @@ public class LogicGatesPlugin extends JavaPlugin {
             List<Location> batch = new ArrayList<>(gatesToUpdate.size());
             while (true) {
                 Location loc = gatesToUpdate.poll();
-                if (loc == null) break;
+                if (loc == null)
+                    break;
                 batch.add(loc);
             }
 
@@ -592,50 +636,67 @@ public class LogicGatesPlugin extends JavaPlugin {
             particleTask.cancel();
         }
     }
-    //endregion
+    // endregion
 
-    //region Debugging and Messages
+    // region Debugging and Messages
 
     /// Sends a debug update message for a gate to all registered debug players.
     ///
-    /// @param gateBlock   the block representing the gate
-    /// @param data        the data associated with the gate
-    /// @param leftInput   the state of the left redstone input
-    /// @param rightInput  the state of the right redstone input
+    /// @param gateBlock the block representing the gate
+    /// @param data the data associated with the gate
+    /// @param leftInput the state of the left redstone input
+    /// @param rightInput the state of the right redstone input
     /// @param outputResult the computed output state of the gate
     public void debugGateUpdate(Block gateBlock, GateData data,
-                                boolean leftInput, boolean rightInput, boolean backInput, boolean outputResult) {
+            boolean leftInput, boolean rightInput, boolean backInput, boolean outputResult) {
         // Exit early if there are no debug players to notify
-        if (debugPlayers.isEmpty()) return;
+        if (debugPlayers.isEmpty())
+            return;
 
         // Create a debug message using a text block
-        String debugInfo = String.format("""
-                        &6[DEBUG]&e Gate at %s
-                        &7Type:&f %s
-                        &7Facing:&f %s
-                        &7Input 1:&f %s
-                        &7Input 2:&f %s
-                        &7Input 3:&f %s
-                        &7Output:&f %s
-                        """,
-                formatLocation(gateBlock.getLocation()),
-                data.getType().name(),
-                data.getFacing().name(),
-                formatRedstoneState(leftInput),
-                formatRedstoneState(rightInput),
-                formatRedstoneState(backInput),
-                formatRedstoneState(outputResult)
-        );
+        String debugInfo;
+        if (data.getType() == GateType.NOT) {
+            debugInfo = String.format("""
+                    &6[DEBUG]&e Gate at %s
+                    &7Type:&f %s
+                    &7Facing:&f %s
+                    &7Input 1:&f %s
+                    &7Output:&f %s
+                    """,
+                    formatLocation(gateBlock.getLocation()),
+                    data.getType().name(),
+                    data.getFacing().name(),
+                    formatRedstoneState(leftInput),
+                    formatRedstoneState(outputResult));
+        } else {
+            debugInfo = String.format("""
+                    &6[DEBUG]&e Gate at %s
+                    &7Type:&f %s
+                    &7Facing:&f %s
+                    &7Input 1:&f %s
+                    &7Input 2:&f %s
+                    &7Input 3:&f %s
+                    &7Output:&f %s
+                    """,
+                    formatLocation(gateBlock.getLocation()),
+                    data.getType().name(),
+                    data.getFacing().name(),
+                    formatRedstoneState(leftInput),
+                    formatRedstoneState(rightInput),
+                    formatRedstoneState(backInput),
+                    formatRedstoneState(outputResult));
+        }
 
         // Translate color codes and broadcast the debug message
         String formatted = ChatColor.translateAlternateColorCodes('&', debugInfo);
         broadcastDebugMessage(gateBlock, formatted);
     }
 
-    /// Broadcasts a debug message to all debug players who are within a valid distance of the specified gate.
+    /// Broadcasts a debug message to all debug players who are within a valid
+    /// distance of the specified gate.
     ///
     /// @param gateBlock the gate block associated with the debug message
-    /// @param message   the debug message to be sent
+    /// @param message the debug message to be sent
     private void broadcastDebugMessage(Block gateBlock, String message) {
         for (UUID uuid : debugPlayers) {
             Player p = Bukkit.getPlayer(uuid);
@@ -646,18 +707,20 @@ public class LogicGatesPlugin extends JavaPlugin {
         }
     }
 
-    /// Checks whether a player is within an acceptable distance from the gate block to receive debug messages.
+    /// Checks whether a player is within an acceptable distance from the gate block
+    /// to receive debug messages.
     ///
-    /// @param p         the player to check
+    /// @param p the player to check
     /// @param gateBlock the gate block from which the debug message originates
-    /// @return `true` if the player is in the same world and within 16 blocks (256 distance squared); `false` otherwise
+    /// @return `true` if the player is in the same world and within 16 blocks (256
+    /// distance squared); `false` otherwise
     private boolean isValidRecipient(Player p, Block gateBlock) {
         return p.getWorld().equals(gateBlock.getWorld()) &&
                 p.getLocation().distanceSquared(gateBlock.getLocation()) <= 256;
     }
-    //endregion
+    // endregion
 
-    //region Getters/Setters
+    // region Getters/Setters
 
     /// Returns the map of gate locations and their corresponding data.
     ///
@@ -713,8 +776,21 @@ public class LogicGatesPlugin extends JavaPlugin {
         return inputToggleModePlayers;
     }
 
-    public boolean isLegacyMode() { return legacyMode; }
-    public void setLegacyMode(boolean legacyMode) { this.legacyMode = legacyMode; }
+    public boolean isLegacyMode() {
+        return legacyMode;
+    }
+
+    public void setLegacyMode(boolean legacyMode) {
+        this.legacyMode = legacyMode;
+    }
+
+    public String getNotGateInputPosition() {
+        return notGateInputPosition;
+    }
+
+    public void setNotGateInputPosition(String notGateInputPosition) {
+        this.notGateInputPosition = notGateInputPosition;
+    }
 
     /// Checks if particle effects are enabled.
     ///
@@ -753,7 +829,8 @@ public class LogicGatesPlugin extends JavaPlugin {
 
     /// Enables or disables redstone compatibility mode.
     ///
-    /// @param redstoneCompatibility `true` to enable compatibility, `false` to disable it
+    /// @param redstoneCompatibility `true` to enable compatibility, `false` to
+    /// disable it
     public void setRedstoneCompatibility(boolean redstoneCompatibility) {
         this.redstoneCompatibility = redstoneCompatibility;
     }
@@ -799,5 +876,5 @@ public class LogicGatesPlugin extends JavaPlugin {
         configManager.reloadConfiguration();
         gatesConfigManager.loadGates(gates);
     }
-    //endregion
+    // endregion
 }
