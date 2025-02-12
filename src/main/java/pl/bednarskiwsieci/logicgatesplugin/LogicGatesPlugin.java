@@ -1,15 +1,7 @@
 package pl.bednarskiwsieci.logicgatesplugin;
 
-import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
-import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
-import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
-import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
-import pl.bednarskiwsieci.logicgatesplugin.util.GatesConfigManager;
-import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.util.eventbus.EventBus;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,8 +17,18 @@ import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import pl.bednarskiwsieci.logicgatesplugin.commands.LogicGatesCommand;
+import pl.bednarskiwsieci.logicgatesplugin.integrations.WorldEditIntegration;
+import pl.bednarskiwsieci.logicgatesplugin.listeners.GateListener;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
+import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
+import pl.bednarskiwsieci.logicgatesplugin.util.ConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
+import pl.bednarskiwsieci.logicgatesplugin.util.GatesConfigManager;
+import pl.bednarskiwsieci.logicgatesplugin.util.UpdateChecker;
 
 import java.io.File;
 import java.util.*;
@@ -124,12 +126,19 @@ public class LogicGatesPlugin extends JavaPlugin {
             getLogger().severe("An error occurred while checking for updates");
         }
 
-        // Register WorldEdit Integration
-        try {
-            WorldEdit.getInstance().getEventBus().register(new WorldEditIntegration(this));
-            getLogger().info("WorldEdit Integration has been registered");
-        } catch (Exception e) {
-            getLogger().severe("Failed to register WorldEdit integration");
+        // Register WorldEdit Integration if WorldEdit is present
+        if (isWorldEditPresent()) {
+            try {
+                WorldEdit worldEditInstance = WorldEdit.getInstance();
+                EventBus eventBus = worldEditInstance.getEventBus();
+                eventBus.register(new WorldEditIntegration(this));
+                getLogger().info("WorldEdit Integration has been registered");
+            } catch (Exception e) {
+                getLogger().severe("Failed to register WorldEdit integration");
+                e.printStackTrace();
+            }
+        } else {
+            getLogger().info("WorldEdit not found, skipping integration");
         }
     }
 
@@ -158,6 +167,16 @@ public class LogicGatesPlugin extends JavaPlugin {
     //endregion
 
     //region Component Registration
+    private boolean isWorldEditPresent() {
+        Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
+        for(Plugin plugin : plugins) {
+            if (plugin.getName().toLowerCase().contains("worldedit")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void registerCommands() {
         Objects.requireNonNull(getCommand("logicgates")).setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
     }
