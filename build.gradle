@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'pl.bednarskiwsieci'
-version = '1.1.7'
+version = '1.1.9'
 
 repositories {
     mavenCentral()
@@ -24,8 +24,9 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
     compileOnly("com.google.code.gson:gson:2.12.1")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.3.0")
     implementation("org.bstats:bstats-bukkit:3.0.0")
 }
 
