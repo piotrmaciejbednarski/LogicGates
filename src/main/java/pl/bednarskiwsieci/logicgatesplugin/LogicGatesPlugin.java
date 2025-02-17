@@ -176,8 +176,11 @@ public class LogicGatesPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        Objects.requireNonNull(getCommand("logicgates"))
+        Objects.requireNonNull(this.getCommand("logicgates"))
                 .setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
+
+        // Register the WorldEditIntegration event listener
+        this.getServer().getPluginManager().registerEvents(new WorldEditIntegration(this), this);
     }
 
     private void registerEventListeners() {
