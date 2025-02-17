@@ -391,7 +391,7 @@ public class LogicGatesCommand implements CommandExecutor {
                 "Press the button to go to the documentation:\n",
                 "[Go to documentation]",
                 ChatColor.YELLOW,
-                "https://logicgates-docs.vercel.app/",
+                "https://logicgates.bednarskiwsieci.pl/",
                 "Click to open documentation"
         );
     }
