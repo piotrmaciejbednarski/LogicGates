@@ -1,5 +1,6 @@
 <div align="center">
-  <img src="https://logicgates.bednarskiwsieci.pl/_next/image?url=%2Fheader_dark.png&w=640&q=75" width="640" alt="LogicGates Logo"/>
+  <img src="https://raw.githubusercontent.com/piotrmaciejbednarski/piotrmaciejbednarski/refs/heads/main/header_dark.png#gh-dark-mode-only" width="640" alt="LogicGates Logo"/>
+  <img src="https://raw.githubusercontent.com/piotrmaciejbednarski/piotrmaciejbednarski/refs/heads/main/header.png#gh-light-mode-only" width="640" alt="LogicGates Logo"/>
 </div>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
