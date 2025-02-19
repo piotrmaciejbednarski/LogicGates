@@ -8,6 +8,8 @@
 
 This Spigot plugin provides a compact and efficient way to build logic gates directly within your Minecraft world.
 
+## Features
+
 - **Extensive Gate Selection**: Build one of the 7 basic logic gates (NOT, OR, AND, XOR, NOR, NAND, XNOR) and additional gates such as implication, TIMER (oscillator), or RS-Latch (memory gate).
 - **Intuitive Interface**: Choose gates using a graphical interface (GUI).
 - **High Performance**: The plugin runs efficiently thanks to a system of synchronization with server ticks, task queuing, batch processing, and many optimization techniques.
