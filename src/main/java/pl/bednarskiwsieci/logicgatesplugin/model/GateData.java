@@ -52,9 +52,7 @@ public class GateData {
         this.interval = interval;
     }
 
-    public boolean isThreeInput() {
-        return isThreeInput;
-    }
+    public boolean isThreeInput() { return isThreeInput; }
 
     public void setThreeInput(boolean threeInput) {
         isThreeInput = threeInput;

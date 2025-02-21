@@ -165,6 +165,10 @@ public class LogicGatesPlugin extends JavaPlugin {
     // endregion
 
     // region Component Registration
+
+    /// Checks if the WorldEdit plugin is present on the server.
+    ///
+    /// @return true if WorldEdit is present, false otherwise
     private boolean isWorldEditPresent() {
         Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
         for (Plugin plugin : plugins) {
@@ -175,6 +179,8 @@ public class LogicGatesPlugin extends JavaPlugin {
         return false;
     }
 
+    /// Registers the commands for the plugin. The main command "logicgates" is set with its executor.
+    /// Also registers the WorldEditIntegration event listener.
     private void registerCommands() {
         Objects.requireNonNull(this.getCommand("logicgates"))
                 .setExecutor(new LogicGatesCommand(this, configManager, updateChecker));
@@ -183,6 +189,7 @@ public class LogicGatesPlugin extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new WorldEditIntegration(this), this);
     }
 
+    /// Registers the event listeners for the plugin. This includes the GateListener which handles gate-related events.
     private void registerEventListeners() {
         getServer().getPluginManager().registerEvents(new GateListener(this, configManager, updateChecker), this);
     }
@@ -252,6 +259,8 @@ public class LogicGatesPlugin extends JavaPlugin {
     // endregion
 
     // region Gate management
+
+    /// Initializes the tick system to update the tick counter every server tick (50ms).
     private void initializeTickSystem() {
         // Update tick counter every server tick (50ms)
         new BukkitRunnable() {
@@ -262,6 +271,10 @@ public class LogicGatesPlugin extends JavaPlugin {
         }.runTaskTimer(this, 0L, 1L);
     }
 
+    /// Schedules updates for blocks that are dependent on the given output block and facing direction.
+    ///
+    /// @param outputBlock the block for which dependent updates are to be scheduled.
+    /// @param facing the direction the block is facing.
     private void scheduleDependentUpdates(Block outputBlock, BlockFace facing) {
         // Check all potential connection directions
         EnumSet<BlockFace> directions = EnumSet.of(
@@ -812,28 +825,56 @@ public class LogicGatesPlugin extends JavaPlugin {
         return inspectionModePlayers;
     }
 
+    /**
+     * Gets the players who are in input toggle mode.
+     *
+     * @return a set of UUIDs representing the players in input toggle mode.
+     */
     public Set<UUID> getInputToggleModePlayers() {
         return inputToggleModePlayers;
     }
 
+    /// Checks if the legacy mode is enabled.
+    ///
+    /// @return true if legacy mode is enabled, false otherwise.
     public boolean isLegacyMode() {
         return legacyMode;
     }
 
+    /// Sets the legacy mode.
+    ///
+    /// @param legacyMode true to enable legacy mode, false to disable it.
     public void setLegacyMode(boolean legacyMode) {
         this.legacyMode = legacyMode;
     }
 
+    /// Checks if the NotGateInputPosition mode is enabled.
+    ///
+    /// @return true if mode is enabled, false otherwise.
     public String getNotGateInputPosition() {
         return notGateInputPosition;
     }
 
+    /// Sets the NotGateInputPosition mode.
+    ///
+    /// @param notGateInputPosition true to enable, false to disable it.
     public void setNotGateInputPosition(String notGateInputPosition) {
         this.notGateInputPosition = notGateInputPosition;
     }
 
-    public boolean isOneTick() { return oneTick; }
-    public void setOneTick(boolean oneTick) { this.oneTick = oneTick; }
+    /// Checks if the one-tick mode is enabled.
+    ///
+    /// @return true if one-tick mode is enabled, false otherwise.
+    public boolean isOneTick() {
+        return oneTick;
+    }
+
+    /// Sets the one-tick mode.
+    ///
+    /// @param oneTick true to enable one-tick mode, false to disable it.
+    public void setOneTick(boolean oneTick) {
+        this.oneTick = oneTick;
+    }
 
     /// Checks if particle effects are enabled.
     ///
@@ -915,7 +956,10 @@ public class LogicGatesPlugin extends JavaPlugin {
         return GateUtils.convertStringToLocation(str);
     }
 
-    public void reloadConfiguration() {
+    /// Reloads the global configuration for the plugin.
+    /// This involves reloading the main configuration settings.
+    /// and reloading the gate configurations.
+    public void reloadGlobalConfiguration() {
         configManager.reloadConfiguration();
         gatesConfigManager.loadGates(gates);
     }

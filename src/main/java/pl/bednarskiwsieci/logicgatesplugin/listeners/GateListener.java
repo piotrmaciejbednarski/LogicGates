@@ -53,6 +53,12 @@ public class GateListener implements Listener {
         this.updateChecker = updateChecker;
     }
 
+    /**
+     * Determines the direction a player is facing based on their yaw.
+     *
+     * @param player the player whose facing direction is to be determined.
+     * @return the BlockFace direction the player is facing (NORTH, EAST, SOUTH, or WEST).
+     */
     public static BlockFace getPlayerFacingDirection(Player player) {
         float yaw = player.getLocation().getYaw();
 
@@ -446,6 +452,9 @@ public class GateListener implements Listener {
         }
     }
 
+    /// Handles the InventoryClickEvent to manage interactions with a custom GUI.
+    ///
+    /// @param event the InventoryClickEvent triggered when a player clicks in an inventory.
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
