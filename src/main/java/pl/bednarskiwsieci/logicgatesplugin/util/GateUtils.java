@@ -96,7 +96,7 @@ public final class GateUtils {
             case XOR -> {
                 if (isThreeInput) {
                     int count = (input1 ? 1 : 0) + (input2 ? 1 : 0) + (input3 ? 1 : 0);
-                    yield count % 2 == 1;
+                    yield (count & 1) == 1;
                 } else {
                     yield input1 != input2;
                 }
