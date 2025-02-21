@@ -19,6 +19,7 @@ public class ConfigManager {
     public static final String CONFIG_LANGUAGE = "language";
     public static final String CONFIG_LEGACY_MODE = "legacyMode";
     public static final String CONFIG_NOT_GATE_INPUT_POSITION = "notGateInputPosition";
+    public static final String CONFIG_ONE_TICK = "oneTick";
 
     private final LogicGatesPlugin plugin;
     private File configFile;
@@ -61,6 +62,7 @@ public class ConfigManager {
         plugin.setDefaultLang(config.getString(CONFIG_LANGUAGE, "en"));
         plugin.setLegacyMode(config.getBoolean(CONFIG_LEGACY_MODE, false));
         plugin.setNotGateInputPosition(config.getString(CONFIG_NOT_GATE_INPUT_POSITION, "default"));
+        plugin.setOneTick(config.getBoolean(CONFIG_ONE_TICK, false));
     }
 
     /// Reloads configuration from disk
@@ -83,6 +85,7 @@ public class ConfigManager {
             diskConfig.set(CONFIG_LANGUAGE, plugin.getDefaultLang());
             diskConfig.set(CONFIG_LEGACY_MODE, plugin.isLegacyMode());
             diskConfig.set(CONFIG_NOT_GATE_INPUT_POSITION, plugin.getNotGateInputPosition());
+            diskConfig.set(CONFIG_ONE_TICK, plugin.isOneTick());
 
             diskConfig.save(configFile);
         } catch (IOException e) {

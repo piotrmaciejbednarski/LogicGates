@@ -115,6 +115,10 @@ public class LogicGatesCommand implements CommandExecutor {
         return true;
     }
 
+    /// Handles the update check command sent by the specified sender. If the sender has the required admin permissions,
+    /// an update check will be initiated, and a message will be sent to the sender indicating that the update check is in progress.
+    ///
+    /// @param sender the command sender who issued the update check command
     private void handleUpdateCheck(CommandSender sender) {
         if (!validateAdminPermission(sender)) return;
 
@@ -129,12 +133,21 @@ public class LogicGatesCommand implements CommandExecutor {
         plugin.toggleDebugMode((Player) sender);
     }
 
+    /// Handles the reload command sent by the specified sender. If the sender has the required admin permissions,
+    /// the plugin configuration will be reloaded and a confirmation message will be sent to the sender.
+    ///
+    /// @param sender the command sender who issued the reload command
     private void handleReload(CommandSender sender) {
         if (!validateAdminPermission(sender)) return;
-        plugin.reloadConfiguration();
+        plugin.reloadGlobalConfiguration();
         sender.sendMessage("LogicGates config reloaded!");
     }
 
+    /// Handles the toggle input command sent by the specified sender. If the sender is a player and has the required
+    /// permissions, the player will be added to the input toggle mode players list and a confirmation message will be sent.
+    /// If the sender is not a player, an error message will be sent.
+    ///
+    /// @param sender the command sender who issued the toggle input command
     private void handleToggleInputCommand(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(plugin.getMessage("errors.player_only"));
@@ -165,6 +178,11 @@ public class LogicGatesCommand implements CommandExecutor {
         openGateGUI(player);
     }
 
+    /// Opens the gate selection GUI for the specified player. The GUI will display all configured gate items
+    /// based on the configuration settings. If no gates are configured or the configuration section is missing,
+    /// appropriate messages will be sent to the player.
+    ///
+    /// @param player the player for whom the gate selection GUI will be opened
     private void openGateGUI(Player player) {
         ConfigurationSection carpetsSection = configManager.getConfig().getConfigurationSection("carpets");
         if (carpetsSection == null) {
@@ -210,6 +228,12 @@ public class LogicGatesCommand implements CommandExecutor {
         player.openInventory(gui);
     }
 
+    /// Creates a GUI item for the specified gate type using the given configuration section and material.
+    ///
+    /// @param itemSection the configuration section containing item settings
+    /// @param material the material of the item to be created
+    /// @param type the type of the gate to be associated with the item
+    /// @return the created ItemStack with the gate type identifier
     private ItemStack createGUIItem(ConfigurationSection itemSection, Material material, GateType type) {
         ItemStack item = createConfiguredItem(itemSection, material);
         ItemMeta meta = item.getItemMeta();
@@ -304,6 +328,10 @@ public class LogicGatesCommand implements CommandExecutor {
         player.sendMessage(plugin.getMessage("rotate_wand_received"));
     }
 
+    /// Creates a new rotation wand ItemStack. The rotation wand is a stick with a unique custom model data value,
+    /// display name, lore, and is unbreakable.
+    ///
+    /// @return the created rotation wand ItemStack
     private ItemStack createRotationWand() {
         ItemStack wand = new ItemStack(Material.STICK);
         ItemMeta meta = wand.getItemMeta();
@@ -317,6 +345,11 @@ public class LogicGatesCommand implements CommandExecutor {
 
     //endregion
 
+    /// Checks if the given ItemStack is a rotation wand. A rotation wand is identified by being a stick
+    /// with a specific custom model data value.
+    ///
+    /// @param item the ItemStack to check
+    /// @return true if the item is a rotation wand, false otherwise
     public boolean isRotationWand(ItemStack item) {
         if (item == null || item.getType() != Material.STICK) return false;
         ItemMeta meta = item.getItemMeta();

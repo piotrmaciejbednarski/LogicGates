@@ -27,7 +27,6 @@ import org.bukkit.inventory.meta.BookMeta;
 import pl.bednarskiwsieci.logicgatesplugin.LogicGatesPlugin;
 import pl.bednarskiwsieci.logicgatesplugin.model.GateData;
 import pl.bednarskiwsieci.logicgatesplugin.model.GateType;
-import pl.bednarskiwsieci.logicgatesplugin.util.GateUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

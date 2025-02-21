@@ -28,6 +28,7 @@ public class GatesConfigManager {
         initializeGatesFile();
     }
 
+    /// Initializes the gates file. If the file doesn't exist, it creates a new one.
     private void initializeGatesFile() {
         gatesFile = new File(plugin.getDataFolder(), GATES_FILE_NAME);
 
@@ -41,6 +42,9 @@ public class GatesConfigManager {
         }
     }
 
+    /// Saves the current state of gates to the gates file.
+    ///
+    /// @param gates a ConcurrentHashMap containing the locations and data of the gates to be saved.
     public void saveGates(ConcurrentHashMap<Location, GateData> gates) {
         Map<String, GateData> serializableGates = new HashMap<>();
 
@@ -55,6 +59,9 @@ public class GatesConfigManager {
         }
     }
 
+    /// Loads the gates from the gates file into the provided ConcurrentHashMap.
+    ///
+    /// @param gates a ConcurrentHashMap that will be populated with the loaded gates.
     public void loadGates(ConcurrentHashMap<Location, GateData> gates) {
         try (FileReader reader = new FileReader(gatesFile)) {
             Map<String, GateData> serializedGates = gson.fromJson(reader,

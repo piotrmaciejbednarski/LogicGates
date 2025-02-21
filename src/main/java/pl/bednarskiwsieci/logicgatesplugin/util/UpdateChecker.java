@@ -21,6 +21,7 @@ public class UpdateChecker {
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
+
     // GitHub repository details (CHANGE THESE)
     private static final String GITHUB_USER = "piotrmaciejbednarski";
     private static final String REPO_NAME = "LogicGates";
@@ -129,6 +130,9 @@ public class UpdateChecker {
         return latestParts.length > currentParts.length;
     }
 
+    /// Sends an update message to the specified receiver.
+    ///
+    /// @param receiver the command sender who will receive the update message.
     public void sendUpdateMessage(CommandSender receiver) {
         String message = plugin.getMessage("update_checker.available",
                 latestVersion, plugin.getDescription().getVersion());
@@ -148,10 +152,16 @@ public class UpdateChecker {
                 TimeUnit.HOURS.toMillis(checkInterval);
     }
 
+    /// Gets the latest available version of the plugin.
+    ///
+    /// @return a string representing the latest version.
     public String getLatestVersion() {
         return this.latestVersion;
     }
 
+    /// Gets the download URL for the latest version of the plugin.
+    ///
+    /// @return a string representing the download URL.
     public String getDownloadUrl() {
         return String.format("https://github.com/%s/%s/releases/latest",
                 GITHUB_USER,
