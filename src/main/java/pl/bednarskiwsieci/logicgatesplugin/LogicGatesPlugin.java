@@ -44,7 +44,6 @@ public class LogicGatesPlugin extends JavaPlugin {
     private final ConcurrentHashMap<Location, GateData> gates = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<Location> gatesToUpdate = new ConcurrentLinkedQueue<>();
     private final Set<UUID> debugPlayers = new HashSet<>();
-    private final Set<UUID> rotationModePlayers = new HashSet<>();
     private final Set<UUID> inspectionModePlayers = new HashSet<>();
     private final Set<UUID> inputToggleModePlayers = new HashSet<>();
     private final Set<UUID> cooldownModePlayers = new HashSet<>();
@@ -75,6 +74,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     private String defaultLang = "en";
     private boolean legacyMode = false;
     private String notGateInputPosition = "default";
+    private boolean oneTick = false;
     // endregion
 
     // region Task Management
@@ -112,7 +112,7 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Initialize bStats
         int BSTATS_ID = 24700;
-        Metrics metrics = new Metrics(this, BSTATS_ID);
+        new Metrics(this, BSTATS_ID);
 
         // Automatic update check on startup
         try {
@@ -311,7 +311,8 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         // Tick-based cooldown check (2 ticks minimum)
         Long lastTick = lastUpdateTicks.get(loc);
-        if (lastTick != null && (serverTick.get() - lastTick) < 2)
+        int ticks = isOneTick() ? 1 : 2;
+        if (lastTick != null && (serverTick.get() - lastTick) < ticks)
             return;
 
         // Store current tick before processing
@@ -524,7 +525,6 @@ public class LogicGatesPlugin extends JavaPlugin {
     private void cleanupData() {
         gates.clear();
         debugPlayers.clear();
-        rotationModePlayers.clear();
         inspectionModePlayers.clear();
     }
 
@@ -761,13 +761,6 @@ public class LogicGatesPlugin extends JavaPlugin {
         return debugPlayers;
     }
 
-    /// Returns the set of player UUIDs who are in rotation mode.
-    ///
-    /// @return the set of players in rotation mode
-    public Set<UUID> getRotationModePlayers() {
-        return rotationModePlayers;
-    }
-
     /// Returns the set of player UUIDs who are in inspection mode.
     ///
     /// @return the set of players in inspection mode
@@ -794,6 +787,9 @@ public class LogicGatesPlugin extends JavaPlugin {
     public void setNotGateInputPosition(String notGateInputPosition) {
         this.notGateInputPosition = notGateInputPosition;
     }
+
+    public boolean isOneTick() { return oneTick; }
+    public void setOneTick(boolean oneTick) { this.oneTick = oneTick; }
 
     /// Checks if particle effects are enabled.
     ///
