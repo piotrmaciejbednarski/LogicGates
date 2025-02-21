@@ -290,65 +290,106 @@ public class LogicGatesPlugin extends JavaPlugin {
     ///
     /// @param gateBlock the block representing the gate
     public void updateGate(Block gateBlock) {
-        // Retrieve the location of the gate block.
         Location loc = gateBlock.getLocation();
-        // Retrieve the stored data for the gate at this location.
         GateData data = gates.get(loc);
 
-        // If no data is found or if the gate doesn't have the required activation
-        // carpet
-        if (data == null || !hasActivationCarpet(gateBlock))
+        // Validate gate data and carpet activation
+        if (!isValidGate(gateBlock, data)) {
             return;
+        }
 
-        // Get the output block relative to the gate's facing direction.
+        // Determine primary states
         final BlockFace facing = data.getFacing();
-        Block outputBlock = gateBlock.getRelative(facing);
-
+        Block outputBlock = findOutputBlock(gateBlock, facing);
         boolean currentPhysicalState = getRedstoneState(gateBlock, facing);
-
-        // Bypass cooldown for initial state mismatch
-        boolean forceUpdate = (data.getState() != currentPhysicalState);
-
-        // Tick-based cooldown check (2 ticks minimum)
-        Long lastTick = lastUpdateTicks.get(loc);
-        int ticks = isOneTick() ? 1 : 2;
-        if (lastTick != null && (serverTick.get() - lastTick) < ticks)
+        boolean forceUpdate = checkForceUpdate(data, currentPhysicalState);
+        if (!canUpdate(loc, forceUpdate)) {
             return;
+        }
 
-        // Store current tick before processing
-        lastUpdateTicks.put(loc, serverTick.get());
+        // Calculate input states
+        InputStates inputs = determineInputStates(gateBlock, data);
 
-        // If a carpet is present at the standard output location, shift the output
-        // block one further block in the facing direction.
+        // Calculate final output
+        boolean output = GateUtils.calculateOutput(data.getType(),
+                inputs.leftState,
+                inputs.rightState,
+                inputs.backState,
+                data);
+
+        // Apply update if needed
+        applyGateOutput(gateBlock, data, outputBlock, output, inputs, forceUpdate);
+    }
+
+    // Helper method: validate gate data and activation
+    private boolean isValidGate(Block gateBlock, GateData data) {
+        return (data != null && hasActivationCarpet(gateBlock));
+    }
+
+    // Helper method: locate the output block, accounting for carpets
+    private Block findOutputBlock(Block gateBlock, BlockFace facing) {
+        Block outputBlock = gateBlock.getRelative(facing);
         if (carpetTypes.containsKey(outputBlock.getType())) {
             outputBlock = outputBlock.getRelative(facing, 1);
         }
+        return outputBlock;
+    }
 
-        BlockFace leftFacing = GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER);
-        BlockFace rightFacing = GateUtils.rotateClockwise(facing, ROTATION_ORDER);
-        BlockFace backFacing = facing.getOppositeFace();
+    // Helper method: decide if we need to force an update
+    private boolean checkForceUpdate(GateData data, boolean currentPhysicalState) {
+        return data.getState() != currentPhysicalState;
+    }
 
+    // Helper method: check the cooldown based on ticks
+    private boolean canUpdate(Location loc, boolean forceUpdate) {
+        int ticks = isOneTick() ? 1 : 2;
+        Long lastTick = lastUpdateTicks.get(loc);
+
+        // If not forcing an update and not enough ticks have passed, skip
+        if (!forceUpdate && lastTick != null && (serverTick.get() - lastTick) < ticks) {
+            return false;
+        }
+
+        // Record the current tick
+        lastUpdateTicks.put(loc, serverTick.get());
+        return true;
+    }
+
+    // Helper struct for holding input states
+    private static class InputStates {
         boolean leftState;
         boolean rightState;
         boolean backState;
 
-        // Determine the redstone input states from the left and right sides
-        leftState = getRedstoneState(gateBlock, leftFacing);
-        rightState = getRedstoneState(gateBlock, rightFacing);
-        backState = false;
+        InputStates(boolean left, boolean right, boolean back) {
+            this.leftState = left;
+            this.rightState = right;
+            this.backState = back;
+        }
+    }
 
+    // Helper method: compute the three input states (left, right, back)
+    private InputStates determineInputStates(Block gateBlock, GateData data) {
+        BlockFace facing = data.getFacing();
+        BlockFace leftFacing = GateUtils.rotateCounterClockwise(facing, ROTATION_ORDER);
+        BlockFace rightFacing = GateUtils.rotateClockwise(facing, ROTATION_ORDER);
+        BlockFace backFacing = facing.getOppositeFace();
+
+        boolean leftState = getRedstoneState(gateBlock, leftFacing);
+        boolean rightState = getRedstoneState(gateBlock, rightFacing);
+        boolean backState = false;
+
+        // Special NOT gate handling
         if (data.getType() == GateType.NOT) {
-            // Get the input position configuration for NOT gate
             String notInputLocation = getNotGateInputPosition();
-            // Check if the input position is set to "opposite"
             if (notInputLocation.equals("opposite")) {
-                // Set the left state to the opposite face of gate
                 BlockFace currentFacing = facing.getOppositeFace();
                 leftState = getRedstoneState(gateBlock, currentFacing);
                 leftFacing = currentFacing;
             }
         }
 
+        // Three-input gate handling (if needed)
         if (data.isThreeInput()) {
             backState = getRedstoneState(gateBlock, backFacing);
             if (gateBlock.getRelative(backFacing).getType() == Material.AIR) {
@@ -357,25 +398,30 @@ public class LogicGatesPlugin extends JavaPlugin {
         }
 
         // Force false if input block is air
-        if (gateBlock.getRelative(leftFacing).getType() == Material.AIR)
+        if (gateBlock.getRelative(leftFacing).getType() == Material.AIR) {
             leftState = false;
-        if (gateBlock.getRelative(rightFacing).getType() == Material.AIR)
+        }
+        if (gateBlock.getRelative(rightFacing).getType() == Material.AIR) {
             rightState = false;
-        if (gateBlock.getRelative(backFacing).getType() == Material.AIR)
+        }
+        if (gateBlock.getRelative(backFacing).getType() == Material.AIR) {
             backState = false;
+        }
 
-        // Calculate the output state based on the gate's type and the input states.
-        boolean output = GateUtils.calculateOutput(data.getType(), leftState, rightState, backState, data);
+        return new InputStates(leftState, rightState, backState);
+    }
 
-        // Always update if:
-        // 1. Physical state differs from logical state (initialization)
-        // 2. Output changed
-
+    // Helper method: apply gate output to the world
+    private void applyGateOutput(Block gateBlock,
+                                 GateData data,
+                                 Block outputBlock,
+                                 boolean output,
+                                 InputStates inputs,
+                                 boolean forceUpdate) {
         boolean needsUpdate = true;
-
-        // Ignore checking when RS_LATCH
-        if (data.getType() != GateType.RS_LATCH)
+        if (data.getType() != GateType.RS_LATCH) {
             needsUpdate = forceUpdate || (data.getState() != output);
+        }
 
         if (needsUpdate) {
             if (legacyMode) {
@@ -384,13 +430,11 @@ public class LogicGatesPlugin extends JavaPlugin {
                 GateUtils.setRedstonePower(outputBlock, output ? 15 : 0);
             }
             data.setState(output);
-            debugGateUpdate(gateBlock, data, leftState, rightState, backState, output);
-
-            // Play a quiet sound at the gate's location
-            gateBlock.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_PLING, 0.1f, 1.0f);
+            debugGateUpdate(gateBlock, data, inputs.leftState, inputs.rightState, inputs.backState, output);
+            gateBlock.getWorld().playSound(gateBlock.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.1f, 1.0f);
         }
 
-        scheduleDependentUpdates(outputBlock, facing);
+        scheduleDependentUpdates(outputBlock, data.getFacing());
     }
     // endregion
 
