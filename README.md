@@ -63,3 +63,5 @@ Report issues [here](https://github.com/piotrmaciejbednarski/logicgates/issues)
 ## License
 
 Distributed under MIT License. See [LICENSE](https://mit-license.org/) for details.
+
+<img src="https://bstats.org/signatures/bukkit/LogicGates.svg" alt="BStats"/>
