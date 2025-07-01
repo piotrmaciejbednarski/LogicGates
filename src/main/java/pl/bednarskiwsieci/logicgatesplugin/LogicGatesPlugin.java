@@ -43,6 +43,7 @@ public class LogicGatesPlugin extends JavaPlugin {
     // region Data Storage
     private final ConcurrentHashMap<Location, GateData> gates = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<Location> gatesToUpdate = new ConcurrentLinkedQueue<>();
+    private final Set<Location> locationsToUpd = ConcurrentHashMap.newKeySet();
     private final Set<UUID> debugPlayers = new HashSet<>();
     private final Set<UUID> inspectionModePlayers = new HashSet<>();
     private final Set<UUID> inputToggleModePlayers = new HashSet<>();
@@ -285,8 +286,10 @@ public class LogicGatesPlugin extends JavaPlugin {
 
         directions.forEach(dir -> {
             Location dependentLoc = outputBlock.getRelative(dir).getLocation();
-            if (gates.containsKey(dependentLoc)) {
+            if (gates.containsKey(dependentLoc) &&
+                !locationsToUpd.contains(dependentLoc)) {
                 gatesToUpdate.offer(dependentLoc);
+                locationsToUpd.add(dependentLoc);
             }
         });
     }
@@ -350,7 +353,7 @@ public class LogicGatesPlugin extends JavaPlugin {
 
     // Helper method: decide if we need to force an update
     private boolean checkForceUpdate(GateData data, boolean currentPhysicalState) {
-        return data.getState() != currentPhysicalState;
+        return true; // data.getState() != currentPhysicalState;
     }
 
     // Helper method: check the cooldown based on ticks
@@ -444,7 +447,7 @@ public class LogicGatesPlugin extends JavaPlugin {
             }
             data.setState(output);
             debugGateUpdate(gateBlock, data, inputs.leftState, inputs.rightState, inputs.backState, output);
-            gateBlock.getWorld().playSound(gateBlock.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.1f, 1.0f);
+            //gateBlock.getWorld().playSound(gateBlock.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.1f, 1.0f);
         }
 
         scheduleDependentUpdates(outputBlock, data.getFacing());
@@ -675,6 +678,7 @@ public class LogicGatesPlugin extends JavaPlugin {
                 Location loc = gatesToUpdate.poll();
                 if (loc == null)
                     break;
+                locationsToUpd.remove(loc);
                 batch.add(loc);
             }
 

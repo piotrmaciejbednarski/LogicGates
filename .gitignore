@@ -120,3 +120,6 @@ runs/
 
 .oldgit
 .vscode
+
+# For local builds
+build.bat
