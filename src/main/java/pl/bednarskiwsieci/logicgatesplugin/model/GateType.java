@@ -52,5 +52,6 @@ public enum GateType {
     /**
      * Timer gate.
      */
-    TIMER
+    TIMER,
+    D_LATCH
 }

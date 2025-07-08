@@ -63,6 +63,7 @@ public class LogicGatesPlugin extends JavaPlugin {
             put(Material.MAGENTA_CARPET, GateType.IMPLICATION);
             put(Material.ORANGE_CARPET, GateType.RS_LATCH);
             put(Material.BROWN_CARPET, GateType.TIMER);
+            put(Material.PINK_CARPET, GateType.D_LATCH);
         }
     };
     // Tick management system
@@ -435,7 +436,8 @@ public class LogicGatesPlugin extends JavaPlugin {
                                  InputStates inputs,
                                  boolean forceUpdate) {
         boolean needsUpdate = true;
-        if (data.getType() != GateType.RS_LATCH) {
+        if (data.getType() != GateType.RS_LATCH &&
+            data.getType() != GateType.D_LATCH) {
             needsUpdate = forceUpdate || (data.getState() != output);
         }
 

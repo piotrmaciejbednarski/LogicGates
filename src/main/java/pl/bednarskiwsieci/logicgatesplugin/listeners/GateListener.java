@@ -132,6 +132,9 @@ public class GateListener implements Listener {
                 GateType type = plugin.getCarpetTypes().get(placedBlock.getType());
                 GateData data = new GateData(getPlayerFacingDirection(player), type);
                 boolean defaultState = GateUtils.calculateOutput(type, false, false, false, data);
+                if(type == GateType.D_LATCH){ // D Latches require 3 inputs
+                    data.setThreeInput(true);
+                }
                 data.setState(defaultState);
 
                 // Force initial update bypassing cooldown
@@ -329,9 +332,10 @@ public class GateListener implements Listener {
                     data.getType() == GateType.TIMER
                             || data.getType() == GateType.NOT
                             || data.getType() == GateType.RS_LATCH
+                            || data.getType() == GateType.D_LATCH
             ) {
                 plugin.getInputToggleModePlayers().remove(player.getUniqueId());
-                return; // Ignore TIMER, NOT, RS_LATCH gates
+                return; // Ignore TIMER, NOT, RS_LATCH and D_LATCH gates
             }
 
             boolean newState = !data.isThreeInput();

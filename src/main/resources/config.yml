@@ -120,3 +120,11 @@ carpets:
       lore:
         - '&7Creates a Timer gate'
         - '&7Generates signal every 1 second'
+
+  D_LATCH:
+    item:
+      material: pink_carpet
+      name: '&dD LATCH'
+      lore:
+      - '&7Creates a D Latch gate'
+      - '&7Another basic memory element'

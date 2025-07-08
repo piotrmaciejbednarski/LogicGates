@@ -125,6 +125,14 @@ public final class GateUtils {
                 }
                 yield data.getState();
             }
+            case D_LATCH -> {
+                assert isThreeInput: "A D Latch should have 3 inputs";
+                if (input1 || input2) { // side inputs are for controlling
+                    data.setState(input3);
+                    yield input3;
+                }
+                yield data.getState();
+            }
             default -> false;
         };
     }
